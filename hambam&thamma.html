@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minh họa Hàm băm & Thám mã</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'Fira-Code', monospace; }
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn.active { border-color: #2563eb; background-color: #1e40af; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-cyan-400">Sân Chơi Mật Mã Học</h1>
+            <p class="text-gray-400 mt-2">Trực tiếp trải nghiệm Hàm băm và Thám mã.</p>
+        </header>
+
+        <!-- Tabs -->
+        <div class="mb-6 flex justify-center border-b border-gray-700">
+            <button class="tab-btn active py-2 px-6 border-b-2 font-semibold" data-tab="hash">Hàm Băm (Hash Function)</button>
+            <button class="tab-btn py-2 px-6 border-b-2 border-transparent font-semibold text-gray-400 hover:border-gray-500 hover:text-gray-200" data-tab="cryptanalysis">Thám Mã (Cryptanalysis)</button>
+        </div>
+
+        <!-- Hash Function Tab -->
+        <div id="hash" class="tab-content active">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Live Hashing -->
+                <div class="bg-gray-800 p-6 rounded-2xl">
+                    <h2 class="text-2xl font-bold text-cyan-300 mb-4">Tạo "Vân Tay" Số</h2>
+                    <p class="text-sm text-gray-400 mb-4">Nhập dữ liệu bất kỳ và xem các giá trị băm thay đổi ngay lập tức. Hãy thử thay đổi chỉ một ký tự!</p>
+                    <textarea id="hash-input" class="w-full p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500" rows="5" placeholder="Nhập dữ liệu ở đây..."></textarea>
+                    <div class="space-y-3 mt-4 text-sm">
+                        <div>
+                            <label class="font-semibold text-red-400">MD5 (128-bit) - Không an toàn</label>
+                            <div id="md5-output" class="font-mono bg-gray-900 p-2 rounded break-all text-red-400"></div>
+                        </div>
+                        <div>
+                            <label class="font-semibold text-yellow-400">SHA-1 (160-bit) - Không an toàn</label>
+                            <div id="sha1-output" class="font-mono bg-gray-900 p-2 rounded break-all text-yellow-400"></div>
+                        </div>
+                        <div>
+                            <label class="font-semibold text-green-400">SHA-256 (256-bit) - An toàn</label>
+                            <div id="sha256-output" class="font-mono bg-gray-900 p-2 rounded break-all text-green-400"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Collision Demo -->
+                <div class="bg-gray-800 p-6 rounded-2xl">
+                    <h2 class="text-2xl font-bold text-cyan-300 mb-4">Minh họa Xung đột (Collision)</h2>
+                    <p class="text-sm text-gray-400 mb-4">Đây là ví dụ về hai khối dữ liệu <span class="font-bold">hoàn toàn khác nhau</span> nhưng lại tạo ra cùng một giá trị băm MD5. Đây là lý do MD5 không còn an toàn.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-semibold">Dữ liệu 1</label>
+                            <div class="font-mono text-xs bg-gray-900 p-2 rounded break-all h-24 overflow-y-auto">d131dd02c5e6eec4693d9a0698aff95c2fcab58712467eab4004583eb8fb7f8955ad340609f4b30283e488832571415a085125e8f7cdc99fd91dbdf280373c5bd8823e3156348f5bae6dacd436c919c6dd53e2b487da03fd02396306d248cda0e99f33420f577ee8ce54b67080a80d1ec69821bcb6a8839396f9652b6ff72a70</div>
+                        </div>
+                        <div>
+                            <label class="font-semibold">Dữ liệu 2</label>
+                            <div class="font-mono text-xs bg-gray-900 p-2 rounded break-all h-24 overflow-y-auto">d131dd02c5e6eec4693d9a0698aff95c2fcab50712467eab4004583eb8fb7f8955ad340609f4b30283e4888325f1415a085125e8f7cdc99fd91dbd7280373c5bd8823e3156348f5bae6dacd436c919c6dd53e23487da03fd02396306d248cda0e99f33420f577ee8ce54b67080280d1ec69821bcb6a8839396f965ab6ff72a70</div>
+                        </div>
+                        <div>
+                            <label class="font-semibold text-red-400">Cùng giá trị băm MD5</label>
+                            <div class="font-mono bg-gray-900 p-2 rounded break-all text-red-400">79054025255fb1a26e4bc422aef54eb4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cryptanalysis Tab -->
+        <div id="cryptanalysis" class="tab-content">
+            <div class="bg-gray-800 p-6 rounded-2xl">
+                <h2 class="text-2xl font-bold text-cyan-300 mb-4">Tấn công bằng Phân tích Tần suất</h2>
+                <p class="text-sm text-gray-400 mb-6">Đây là ví dụ về tấn công chỉ bằng bản mã (Ciphertext-Only Attack) vào một mật mã thay thế đơn giản. Bằng cách phân tích tần suất xuất hiện của các ký tự, chúng ta có thể đoán ra bản rõ mà không cần biết khóa.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Ciphertext -->
+                    <div class="md:col-span-2">
+                        <label class="font-semibold">Bản mã (Ciphertext)</label>
+                        <div id="ciphertext-display" class="font-mono text-sm bg-gray-900 p-3 rounded mt-2 h-40 overflow-y-auto"></div>
+                        <label class="font-semibold mt-4 block">Bản rõ (đoán)</label>
+                        <div id="plaintext-guess" class="font-mono text-sm bg-gray-900 p-3 rounded mt-2 h-40 overflow-y-auto text-green-400"></div>
+                    </div>
+                    <!-- Frequency Chart -->
+                    <div>
+                        <label class="font-semibold">Tần suất ký tự</label>
+                        <div class="mt-2"><canvas id="freqChart"></canvas></div>
+                        <p class="text-xs text-gray-500 mt-2">Trong tiếng Việt, các chữ cái phổ biến nhất thường là A, N, H, O, T, I...</p>
+                    </div>
+                </div>
+                 <!-- Mapping -->
+                <div class="mt-6">
+                    <label class="font-semibold">Bảng ánh xạ (thay thế)</label>
+                    <div id="mapping-table" class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-13 gap-2 mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Tab Logic ---
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const tabId = btn.getAttribute('data-tab');
+                    tabContents.forEach(content => {
+                        content.id === tabId ? content.classList.add('active') : content.classList.remove('active');
+                    });
+                });
+            });
+
+            // --- Hash Function Logic ---
+            const hashInput = document.getElementById('hash-input');
+            const md5Output = document.getElementById('md5-output');
+            const sha1Output = document.getElementById('sha1-output');
+            const sha256Output = document.getElementById('sha256-output');
+
+            function updateHashes() {
+                const input = hashInput.value;
+                md5Output.textContent = input ? CryptoJS.MD5(input).toString() : '';
+                sha1Output.textContent = input ? CryptoJS.SHA1(input).toString() : '';
+                sha256Output.textContent = input ? CryptoJS.SHA256(input).toString() : '';
+            }
+            hashInput.addEventListener('input', updateHashes);
+            updateHashes();
+
+            // --- Cryptanalysis Logic ---
+            const ciphertextDisplay = document.getElementById('ciphertext-display');
+            const plaintextGuess = document.getElementById('plaintext-guess');
+            const mappingTable = document.getElementById('mapping-table');
+            const freqCtx = document.getElementById('freqChart').getContext('2d');
+            let freqChart;
+
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const samplePlaintext = "MOTTRONGNHUNGNGUYENTACCUABANLACHAPNHANMOITHUDAXAYRAVOIBANTRONGQUAKHUHAYTINVAOMOITHUDACOLYDOCUANOVAMACDUCOTHEBANCHUAHIEUDUOCLYDODAYLUCNAYNHUNGMOTNGAYNAODOSEHIEURA".toUpperCase();
+            let key = {};
+            let reverseKey = {};
+            let ciphertext = '';
+            let userMapping = {};
+
+            function generateCipher() {
+                // Generate a random key
+                let shuffledAlphabet = alphabet.split('').sort(() => 0.5 - Math.random());
+                alphabet.split('').forEach((char, i) => {
+                    key[char] = shuffledAlphabet[i];
+                    reverseKey[shuffledAlphabet[i]] = char;
+                });
+
+                // Encrypt
+                ciphertext = samplePlaintext.split('').map(char => key[char] || char).join('');
+                ciphertextDisplay.textContent = ciphertext;
+                
+                // Init user mapping
+                alphabet.split('').forEach(char => userMapping[char] = '?');
+
+                updateAnalysis();
+            }
+
+            function updateAnalysis() {
+                // Decrypt based on user mapping
+                const guess = ciphertext.split('').map(char => userMapping[char] || char).join('');
+                plaintextGuess.textContent = guess;
+
+                // Frequency analysis
+                const frequencies = {};
+                alphabet.split('').forEach(char => frequencies[char] = 0);
+                ciphertext.split('').forEach(char => {
+                    if (frequencies[char] !== undefined) frequencies[char]++;
+                });
+
+                const sortedFreq = Object.entries(frequencies).sort((a, b) => b[1] - a[1]);
+                
+                if (freqChart) freqChart.destroy();
+                freqChart = new Chart(freqCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedFreq.map(item => item[0]),
+                        datasets: [{
+                            label: 'Số lần xuất hiện',
+                            data: sortedFreq.map(item => item[1]),
+                            backgroundColor: '#1d4ed8',
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true, ticks: { color: '#9ca3af' } }, x: { ticks: { color: '#9ca3af' } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                renderMappingTable();
+            }
+
+            function renderMappingTable() {
+                mappingTable.innerHTML = '';
+                alphabet.split('').forEach(char => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center space-x-1';
+                    const label = document.createElement('span');
+                    label.className = 'font-bold';
+                    label.textContent = char + ':';
+                    const select = document.createElement('select');
+                    select.className = 'bg-gray-700 rounded p-1 text-xs w-10';
+                    select.dataset.cipherChar = char;
+                    
+                    const options = ['?'].concat(alphabet.split(''));
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt;
+                        if (userMapping[char] === opt) option.selected = true;
+                        select.appendChild(option);
+                    });
+                    
+                    select.addEventListener('change', (e) => {
+                        userMapping[e.target.dataset.cipherChar] = e.target.value;
+                        updateAnalysis();
+                    });
+
+                    div.appendChild(label);
+                    div.appendChild(select);
+                    mappingTable.appendChild(div);
+                });
+            }
+
+            generateCipher();
+        });
+    </script>
+</body>
+</html>
