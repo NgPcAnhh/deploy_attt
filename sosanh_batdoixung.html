@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So Sánh Các Thuật Toán Mã Hóa Bất Đối Xứng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        .processing-bar {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-cyan-400">Phân Tích Thuật Toán Mã Hóa Bất Đối Xứng</h1>
+            <p class="text-gray-400 mt-2">So sánh RSA, ECC và Elgamal qua các chỉ số an ninh, hiệu năng và ứng dụng.</p>
+        </header>
+
+        <!-- Algorithm Explanations Section -->
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Nền tảng Toán học</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                    <h3 class="text-xl font-bold text-blue-400 mb-2">RSA</h3>
+                    <p class="text-sm text-gray-300">Dựa trên độ khó của bài toán **phân tích một số cực lớn thành tích của hai số nguyên tố**. Đây là nền tảng của bảo mật web (HTTPS/TLS) trong nhiều thập kỷ.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                    <h3 class="text-xl font-bold text-green-400 mb-2">ECC</h3>
+                    <p class="text-sm text-gray-300">Dựa trên bài toán **logarit rời rạc trên đường cong elliptic**. Hiệu quả vượt trội, cho phép dùng khóa ngắn hơn nhiều so với RSA để đạt cùng độ an toàn.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                    <h3 class="text-xl font-bold text-purple-400 mb-2">Elgamal</h3>
+                    <p class="text-sm text-gray-300">Dựa trên bài toán **logarit rời rạc trong một trường hữu hạn**. Dù an toàn, Elgamal thường chậm hơn và tạo ra bản mã lớn hơn, nên ít phổ biến trong thương mại.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input and Visualization Trigger -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10 border border-gray-700">
+             <div class="flex flex-col md:flex-row gap-4">
+                <textarea id="plaintext" class="w-full p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" rows="3" placeholder="Nhập văn bản để mô phỏng quá trình mã hóa..."></textarea>
+                <button id="runBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 shadow-md flex-shrink-0 disabled:opacity-50 disabled:cursor-wait">
+                    Thực hiện & Phân tích
+                </button>
+            </div>
+        </div>
+        
+        <!-- Visualization Section -->
+        <div id="visualization-section" class="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+             <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold text-blue-400 mb-4">Mô phỏng RSA</h3><div id="rsa-vis" class="w-full bg-gray-700 rounded-full h-4"><div class="processing-bar bg-blue-500 h-4 rounded-full" style="width: 0%"></div></div><p id="rsa-status" class="text-xs text-center mt-2 text-gray-400">Chờ...</p></div>
+             <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold text-green-400 mb-4">Mô phỏng ECC</h3><div id="ecc-vis" class="w-full bg-gray-700 rounded-full h-4"><div class="processing-bar bg-green-500 h-4 rounded-full" style="width: 0%"></div></div><p id="ecc-status" class="text-xs text-center mt-2 text-gray-400">Chờ...</p></div>
+             <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold text-purple-400 mb-4">Mô phỏng Elgamal</h3><div id="elgamal-vis" class="w-full bg-gray-700 rounded-full h-4"><div class="processing-bar bg-purple-500 h-4 rounded-full" style="width: 0%"></div></div><p id="elgamal-status" class="text-xs text-center mt-2 text-gray-400">Chờ...</p></div>
+        </div>
+
+        <!-- Comparison Dashboard Section -->
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Dashboard So Sánh Hiệu Quả</h2>
+            <div id="dashboard-placeholder" class="text-center text-gray-500 py-10"><p>Nhập văn bản và nhấn "Thực hiện & Phân tích" để tạo biểu đồ.</p></div>
+            <div id="dashboard-content" class="grid grid-cols-1 md:grid-cols-2 gap-8 hidden">
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Phân tích Hiệu năng Tác vụ</h3><p class="text-sm text-gray-400 mb-6">So sánh tốc độ tương đối cho các tác vụ chính. Vùng bao phủ càng lớn, hiệu năng càng cao.</p><div class="chart-container"><canvas id="taskPerformanceChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Hiệu năng Mô phỏng (ms)</h3><p class="text-sm text-gray-400 mb-6">Thời gian mô phỏng quá trình mã hóa. Cột càng ngắn, hiệu năng càng cao.</p><div class="chart-container"><canvas id="performanceChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Kích thước khóa cho cùng độ an toàn</h3><p class="text-sm text-gray-400 mb-6">So sánh độ dài khóa (bit) cần thiết để đạt mức an toàn tương đương.</p><div class="chart-container"><canvas id="keySizeChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Ứng dụng và Mức độ Phổ biến</h3><p class="text-sm text-gray-400 mb-6">Phân bổ các lĩnh vực ứng dụng chính của từng thuật toán.</p><div class="chart-container"><canvas id="useCaseChart"></canvas></div></div>
+            </div>
+        </div>
+        
+        <!-- Conclusion Table Section -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-6">Bảng Tổng Kết Chi Tiết</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-300">
+                    <thead class="text-xs text-cyan-300 uppercase bg-gray-700"><tr><th class="px-6 py-3">Tiêu chí</th><th class="px-6 py-3 text-blue-300">RSA</th><th class="px-6 py-3 text-green-300">ECC</th><th class="px-6 py-3 text-purple-300">Elgamal</th></tr></thead>
+                    <tbody>
+                        <tr class="border-b border-gray-700"><td class="px-6 py-4 font-semibold">Cơ sở toán học</td><td class="px-6 py-4">Phân tích số nguyên tố</td><td class="px-6 py-4">Logarit rời rạc trên đường cong elliptic</td><td class="px-6 py-4">Logarit rời rạc trên trường hữu hạn</td></tr>
+                        <tr class="border-b border-gray-700"><td class="px-6 py-4 font-semibold">Kích thước khóa (tiêu biểu)</td><td class="px-6 py-4">2048-4096 bit</td><td class="px-6 py-4">256-384 bit</td><td class="px-6 py-4">>= 2048 bit</td></tr>
+                        <tr class="border-b border-gray-700"><td class="px-6 py-4 font-semibold">Hiệu năng</td><td class="px-6 py-4">Mã hóa/Xác thực nhanh, Giải mã/Ký chậm</td><td class="px-6 py-4">Nhanh hơn RSA ở các tác vụ chính</td><td class="px-6 py-4">Chậm hơn RSA, bản mã lớn</td></tr>
+                        <tr><td class="px-6 py-4 font-semibold">Ứng dụng chính</td><td class="px-6 py-4">TLS/SSL, Email, VPN</td><td class="px-6 py-4">Tiền điện tử, IoT, Mobile, DNSSEC</td><td class="px-6 py-4">Học thuật, Giao thức bỏ phiếu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const plaintextInput = document.getElementById('plaintext');
+            const runBtn = document.getElementById('runBtn');
+            const dashboardPlaceholder = document.getElementById('dashboard-placeholder');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const visualizationSection = document.getElementById('visualization-section');
+            
+            const algorithms = {
+                rsa: { name: 'RSA', perfFactor: 1.2, visBar: document.querySelector('#rsa-vis .processing-bar'), statusEl: document.getElementById('rsa-status') },
+                ecc: { name: 'ECC', perfFactor: 0.8, visBar: document.querySelector('#ecc-vis .processing-bar'), statusEl: document.getElementById('ecc-status') },
+                elgamal: { name: 'Elgamal', perfFactor: 1.8, visBar: document.querySelector('#elgamal-vis .processing-bar'), statusEl: document.getElementById('elgamal-status') }
+            };
+
+            let charts = {};
+
+            async function simulateProcessing(algo, textLength) {
+                const baseTime = 500;
+                const totalTime = baseTime + (textLength * algo.perfFactor);
+                const startTime = performance.now();
+                
+                algo.statusEl.textContent = 'Đang xử lý...';
+                algo.visBar.style.width = '0%';
+
+                const interval = setInterval(() => {
+                    const elapsed = performance.now() - startTime;
+                    const width = (elapsed / totalTime) * 100;
+                    algo.visBar.style.width = `${Math.min(width, 100)}%`;
+                    if (elapsed >= totalTime) {
+                        clearInterval(interval);
+                    }
+                }, 50);
+
+                return new Promise(resolve => setTimeout(() => {
+                     clearInterval(interval);
+                     algo.visBar.style.width = '100%';
+                     const finalTime = performance.now() - startTime;
+                     algo.statusEl.textContent = `Hoàn thành sau ${finalTime.toFixed(0)} ms`;
+                     resolve({ name: algo.name, time: finalTime });
+                }, totalTime));
+            }
+
+            function renderDashboards(performanceData) {
+                dashboardPlaceholder.classList.add('hidden');
+                dashboardContent.classList.remove('hidden');
+
+                Object.values(charts).forEach(chart => chart.destroy());
+
+                // --- Task Performance Chart (Radar) ---
+                const taskPerfCtx = document.getElementById('taskPerformanceChart').getContext('2d');
+                charts.taskPerformance = new Chart(taskPerfCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Tạo khóa', 'Mã hóa / Xác thực', 'Giải mã / Ký'],
+                        datasets: [
+                            { label: 'RSA', data: [3, 9, 2], backgroundColor: 'rgba(96, 165, 250, 0.2)', borderColor: '#60a5fa', pointBackgroundColor: '#60a5fa' },
+                            { label: 'ECC', data: [9, 7, 8], backgroundColor: 'rgba(52, 211, 153, 0.2)', borderColor: '#34d399', pointBackgroundColor: '#34d399' },
+                            { label: 'Elgamal', data: [4, 2, 1], backgroundColor: 'rgba(192, 132, 252, 0.2)', borderColor: '#c084fc', pointBackgroundColor: '#c084fc' }
+                        ]
+                    },
+                    options: {
+                        scales: { r: { angleLines: { color: '#4b5563' }, grid: { color: '#4b5563' }, pointLabels: { color: '#d1d5db' }, ticks: { display: false, beginAtZero: true } } },
+                        plugins: { legend: { labels: { color: '#d1d5db' } }, tooltip: { callbacks: { afterLabel: (c) => 'Điểm càng cao, hiệu năng tương đối càng tốt cho tác vụ đó.' } } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+
+                // --- Simulated Performance Chart (Bar) ---
+                const perfCtx = document.getElementById('performanceChart').getContext('2d');
+                charts.performance = new Chart(perfCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: performanceData.map(d => d.name),
+                        datasets: [{
+                            label: 'Thời gian mô phỏng (ms)',
+                            data: performanceData.map(d => d.time),
+                            backgroundColor: ['#60a5fa', '#34d399', '#c084fc']
+                        }]
+                    },
+                    options: {
+                        scales: { y: { ticks: { color: '#d1d5db' } }, x: { ticks: { color: '#d1d5db' } } },
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (c) => 'Càng thấp càng tốt (hiệu năng cao hơn).' } } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+
+                // --- Key Size Chart (Bar) ---
+                const keySizeCtx = document.getElementById('keySizeChart').getContext('2d');
+                charts.keySize = new Chart(keySizeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['An toàn tương đương AES-128', 'AES-192', 'AES-256'],
+                        datasets: [
+                            { label: 'RSA/Elgamal (bit)', data: [3072, 7680, 15360], backgroundColor: '#60a5fa' },
+                            { label: 'ECC (bit)', data: [256, 384, 521], backgroundColor: '#34d399' }
+                        ]
+                    },
+                    options: {
+                        scales: { y: { type: 'logarithmic', ticks: { color: '#d1d5db' } }, x: { ticks: { color: '#d1d5db' } } },
+                        plugins: { legend: { labels: { color: '#d1d5db' } }, tooltip: { callbacks: { afterLabel: (c) => 'ECC cần khóa ngắn hơn đáng kể để đạt cùng độ an toàn. Càng ngắn càng hiệu quả.' } } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+
+                // --- Use Case Chart (Doughnut) ---
+                const useCaseCtx = document.getElementById('useCaseChart').getContext('2d');
+                charts.useCase = new Chart(useCaseCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Web & Doanh nghiệp (TLS, VPN)', 'Mobile, IoT, Tiền điện tử', 'Học thuật & Chuyên dụng'],
+                        datasets: [{ data: [65, 30, 5], backgroundColor: ['#60a5fa', '#34d399', '#c084fc'], hoverOffset: 4 }]
+                    },
+                    options: {
+                        plugins: { legend: { position: 'top', labels: { color: '#d1d5db' } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%`, afterLabel: (c) => 'RSA và ECC thống trị các ứng dụng thương mại.' } } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+            }
+
+            runBtn.addEventListener('click', async () => {
+                const text = plaintextInput.value;
+                if (!text) {
+                    alert('Vui lòng nhập văn bản để bắt đầu mô phỏng.');
+                    return;
+                }
+                
+                runBtn.disabled = true;
+                runBtn.textContent = 'Đang xử lý...';
+                visualizationSection.classList.remove('hidden');
+                dashboardContent.classList.add('hidden');
+                dashboardPlaceholder.classList.remove('hidden');
+
+                const simulationPromises = Object.values(algorithms).map(algo => simulateProcessing(algo, text.length));
+                
+                const performanceResults = await Promise.all(simulationPromises);
+                
+                renderDashboards(performanceResults);
+
+                runBtn.disabled = false;
+                runBtn.textContent = 'Thực hiện & Phân tích';
+            });
+        });
+    </script>
+
+</body>
+</html>
