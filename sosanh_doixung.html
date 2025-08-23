@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So Sánh Các Thuật Toán Mã Hóa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-mono {
+            font-family: 'Fira-Code', monospace;
+        }
+        .algo-card {
+            border: 1px solid #374151;
+        }
+        .data-block, .data-stream-char {
+            display: inline-block;
+            padding: 4px 6px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-align: center;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .plaintext-block {
+            background-color: #374151;
+            color: #d1d5db;
+            border: 1px solid #4b5563;
+        }
+        .encrypted-block {
+            background-color: #0e7490;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-cyan-400">Trực Quan Hóa & Phân Tích Thuật Toán Mã Hóa</h1>
+            <p class="text-gray-400 mt-2">Bước 1: Quan sát cách thuật toán xử lý dữ liệu. Bước 2: Phân tích hiệu quả tại dashboard bên dưới.</p>
+        </header>
+
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10 border border-gray-700">
+            <div class="flex flex-col md:flex-row gap-4">
+                <textarea id="plaintext" class="w-full p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" rows="3" placeholder="Nhập văn bản càng dài, sự khác biệt về hiệu năng càng rõ..."></textarea>
+                <button id="encryptBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 shadow-md flex-shrink-0 disabled:opacity-50 disabled:cursor-wait">
+                    Trực Quan Hóa
+                </button>
+            </div>
+        </div>
+
+        <!-- Visualization Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            <!-- Cards for AES, DES, Blowfish, RC4 -->
+            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">AES (Rijndael)</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa khối</li><li><strong>Kích thước khối:</strong> 128 bit</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="aes-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
+            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">DES</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa khối</li><li><strong>Kích thước khối:</strong> 64 bit</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="des-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
+            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">Blowfish</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa khối</li><li><strong>Kích thước khối:</strong> 64 bit</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="blowfish-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
+            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">RC4</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa dòng</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="rc4-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
+        </div>
+
+        <!-- Comparison Dashboard Section -->
+        <div class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Dashboard So Sánh Động</h2>
+            <div id="dashboard-placeholder" class="text-center text-gray-500 py-10">
+                <p>Nhập văn bản và nhấn "Trực Quan Hóa" để tạo biểu đồ.</p>
+            </div>
+            <div id="dashboard-content" class="grid grid-cols-1 md:grid-cols-2 gap-8 hidden">
+                <!-- Chart 1: Performance -->
+                <div class="bg-gray-800 p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4 text-white">Hiệu năng Thực tế (ms)</h3>
+                    <p class="text-sm text-gray-400 mb-6">Thời gian hoàn thành quá trình trực quan hóa. Cột càng ngắn, hiệu năng càng cao.</p>
+                    <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+                </div>
+                <!-- Chart 2: Security Score -->
+                <div class="bg-gray-800 p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4 text-white">Phân tích Tổng quan An ninh</h3>
+                    <p class="text-sm text-gray-400 mb-6">So sánh các chỉ số an ninh quan trọng. Vùng bao phủ càng lớn, thuật toán càng mạnh mẽ.</p>
+                    <div class="chart-container"><canvas id="securityChart"></canvas></div>
+                </div>
+                <!-- Chart 3: Modern Relevance -->
+                <div class="bg-gray-800 p-6 rounded-2xl md:col-span-2">
+                    <h3 class="text-xl font-bold mb-4 text-white">Mức độ Phù hợp & Ứng dụng Hiện đại</h3>
+                    <p class="text-sm text-gray-400 mb-6">Ước tính mức độ tin cậy và thị phần sử dụng trong các ứng dụng ngày nay.</p>
+                    <div class="chart-container h-[250px] md:h-[350px]"><canvas id="relevanceChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conclusion Table Section -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-6">Bảng Tổng Kết Chi Tiết</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-300">
+                    <thead class="text-xs text-cyan-300 uppercase bg-gray-700">
+                        <tr> <th scope="col" class="px-6 py-3">Thuật toán</th> <th scope="col" class="px-6 py-3">Kích thước khối</th> <th scope="col" class="px-6 py-3">Không gian khóa</th> <th scope="col" class="px-6 py-3">Phân tích An ninh</th> </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-gray-800 border-b border-gray-700"><th scope="row" class="px-6 py-4 font-bold text-lg text-green-400">AES</th><td class="px-6 py-4">128 bit</td><td class="px-6 py-4 font-mono">2¹²⁸</td><td class="px-6 py-4 text-green-400">"Tiêu chuẩn vàng" toàn cầu.</td></tr>
+                        <tr class="bg-gray-800 border-b border-gray-700"><th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">DES</th><td class="px-6 py-4">64 bit</td><td class="px-6 py-4 font-mono">2⁵⁶</td><td class="px-6 py-4 text-red-400">Hoàn toàn không an toàn.</td></tr>
+                        <tr class="bg-gray-800 border-b border-gray-700"><th scope="row" class="px-6 py-4 font-bold text-lg text-yellow-400">Blowfish</th><td class="px-6 py-4">64 bit</td><td class="px-6 py-4 font-mono">Lên tới 2⁴⁴⁸</td><td class="px-6 py-4 text-yellow-400">An toàn nhưng kích thước khối nhỏ là điểm yếu.</td></tr>
+                        <tr class="bg-gray-800"><th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">RC4</th><td class="px-6 py-4">N/A (Dòng)</td><td class="px-6 py-4 font-mono">Lên tới 2²⁰⁴⁸</td><td class="px-6 py-4 text-red-400">Nhiều lỗ hổng nghiêm trọng.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const plaintextInput = document.getElementById('plaintext');
+            const encryptBtn = document.getElementById('encryptBtn');
+            const dashboardPlaceholder = document.getElementById('dashboard-placeholder');
+            const dashboardContent = document.getElementById('dashboard-content');
+
+            const algorithms = {
+                aes: { name: 'AES', type: 'block', blockSize: 16, visElement: document.getElementById('aes-vis') },
+                des: { name: 'DES', type: 'block', blockSize: 8, visElement: document.getElementById('des-vis') },
+                blowfish: { name: 'Blowfish', type: 'block', blockSize: 8, visElement: document.getElementById('blowfish-vis') },
+                rc4: { name: 'RC4', type: 'stream', visElement: document.getElementById('rc4-vis') }
+            };
+
+            let charts = {};
+
+            function escapeHtml(unsafe) { return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+            async function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+            async function visualize(algo, text) {
+                const startTime = performance.now();
+                const { type, blockSize, visElement } = algo;
+                visElement.innerHTML = ''; 
+                const delay = Math.max(1, 500 / text.length);
+
+                if (type === 'block') {
+                    const paddedText = text.padEnd(Math.ceil(text.length / blockSize) * blockSize, '_');
+                    for (let i = 0; i < paddedText.length; i += blockSize) {
+                        const chunk = paddedText.substring(i, i + blockSize);
+                        const block = document.createElement('span');
+                        block.className = 'data-block plaintext-block';
+                        block.textContent = escapeHtml(chunk);
+                        visElement.appendChild(block);
+                    }
+                    await sleep(250);
+                    const blocks = visElement.querySelectorAll('.data-block');
+                    for (const block of blocks) {
+                        block.classList.remove('plaintext-block');
+                        block.classList.add('encrypted-block');
+                        block.textContent = Array.from({length: blockSize}, () => '●').join('');
+                        await sleep(delay * blockSize);
+                    }
+                } else if (type === 'stream') {
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'data-stream-char plaintext-block';
+                        charSpan.textContent = escapeHtml(char);
+                        visElement.appendChild(charSpan);
+                    }
+                    await sleep(250);
+                    const chars = visElement.querySelectorAll('.data-stream-char');
+                    for (const char of chars) {
+                        char.classList.remove('plaintext-block');
+                        char.classList.add('encrypted-block');
+                        char.textContent = '●';
+                        await sleep(delay);
+                    }
+                }
+                const endTime = performance.now();
+                return endTime - startTime;
+            }
+
+            function renderDashboards(performanceData) {
+                dashboardPlaceholder.classList.add('hidden');
+                dashboardContent.classList.remove('hidden');
+
+                // Destroy old charts if they exist
+                Object.values(charts).forEach(chart => chart.destroy());
+
+                // --- Performance Chart (Bar) ---
+                const perfCtx = document.getElementById('performanceChart').getContext('2d');
+                charts.performance = new Chart(perfCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: performanceData.map(d => d.name),
+                        datasets: [{
+                            label: 'Thời gian thực thi (ms)',
+                            data: performanceData.map(d => d.time),
+                            backgroundColor: ['#22c55e', '#ef4444', '#3b82f6', '#8b5cf6'],
+                            borderColor: '#4b5563',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        scales: { x: { ticks: { color: '#d1d5db' } }, y: { ticks: { color: '#d1d5db' } } },
+                        plugins: { legend: { display: false } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+
+                // --- Security Chart (Radar) ---
+                const securityCtx = document.getElementById('securityChart').getContext('2d');
+                const securityData = {
+                    labels: ['Không gian khóa', 'Kích thước khối', 'Độ bền thuật toán', 'Mức độ phù hợp'],
+                    datasets: [
+                        { label: 'AES', data: [10, 10, 10, 10], fill: true, backgroundColor: 'rgba(34, 197, 94, 0.2)', borderColor: '#22c55e', pointBackgroundColor: '#22c55e' },
+                        { label: 'DES', data: [1, 5, 1, 1], fill: true, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: '#ef4444', pointBackgroundColor: '#ef4444' },
+                        { label: 'Blowfish', data: [10, 5, 8, 4], fill: true, backgroundColor: 'rgba(234, 179, 8, 0.2)', borderColor: '#eab308', pointBackgroundColor: '#eab308' },
+                        { label: 'RC4', data: [10, 0, 1, 1], fill: true, backgroundColor: 'rgba(139, 92, 246, 0.2)', borderColor: '#8b5cf6', pointBackgroundColor: '#8b5cf6' }
+                    ]
+                };
+                charts.security = new Chart(securityCtx, {
+                    type: 'radar',
+                    data: securityData,
+                    options: {
+                        scales: { r: { angleLines: { color: '#4b5563' }, grid: { color: '#4b5563' }, pointLabels: { color: '#d1d5db' }, ticks: { display: false } } },
+                        plugins: { legend: { labels: { color: '#d1d5db' } } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+
+                // --- Relevance Chart (Doughnut) ---
+                const relevanceCtx = document.getElementById('relevanceChart').getContext('2d');
+                charts.relevance = new Chart(relevanceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['AES', 'Blowfish', 'DES/RC4 & Khác'],
+                        datasets: [{
+                            label: 'Thị phần ứng dụng ước tính',
+                            data: [90, 5, 5],
+                            backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        plugins: { legend: { position: 'top', labels: { color: '#d1d5db' } } },
+                        responsive: true, maintainAspectRatio: false
+                    }
+                });
+            }
+
+            encryptBtn.addEventListener('click', async () => {
+                const text = plaintextInput.value;
+                if (!text) {
+                    alert('Vui lòng nhập văn bản để trực quan hóa.');
+                    return;
+                }
+                
+                encryptBtn.disabled = true;
+                encryptBtn.textContent = 'Đang xử lý...';
+
+                const performanceResults = [];
+                for (const key in algorithms) {
+                    const algo = algorithms[key];
+                    const time = await visualize(algo, text);
+                    performanceResults.push({ name: algo.name, time: time });
+                }
+                
+                renderDashboards(performanceResults);
+
+                encryptBtn.disabled = false;
+                encryptBtn.textContent = 'Trực Quan Hóa';
+            });
+        });
+    </script>
+
+</body>
+</html>
