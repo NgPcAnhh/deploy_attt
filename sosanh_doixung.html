@@ -131,13 +131,43 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left text-gray-300">
                     <thead class="text-xs text-cyan-300 uppercase bg-gray-700">
-                        <tr> <th scope="col" class="px-6 py-3">Thuật toán</th> <th scope="col" class="px-6 py-3">Kích thước khối</th> <th scope="col" class="px-6 py-3">Không gian khóa</th> <th scope="col" class="px-6 py-3">Phân tích An ninh</th> </tr>
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Thuật toán</th>
+                            <th scope="col" class="px-6 py-3">Kích thước khối</th>
+                            <th scope="col" class="px-6 py-3">Không gian khóa</th>
+                            <th scope="col" class="px-6 py-3">Độ phức tạp</th>
+                            <th scope="col" class="px-6 py-3">Phân tích An ninh</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr class="bg-gray-800 border-b border-gray-700"><th scope="row" class="px-6 py-4 font-bold text-lg text-green-400">AES</th><td class="px-6 py-4">128 bit</td><td class="px-6 py-4 font-mono">2¹²⁸</td><td class="px-6 py-4 text-green-400">"Tiêu chuẩn vàng" toàn cầu.</td></tr>
-                        <tr class="bg-gray-800 border-b border-gray-700"><th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">DES</th><td class="px-6 py-4">64 bit</td><td class="px-6 py-4 font-mono">2⁵⁶</td><td class="px-6 py-4 text-red-400">Hoàn toàn không an toàn.</td></tr>
-                        <tr class="bg-gray-800 border-b border-gray-700"><th scope="row" class="px-6 py-4 font-bold text-lg text-yellow-400">Blowfish</th><td class="px-6 py-4">64 bit</td><td class="px-6 py-4 font-mono">Lên tới 2⁴⁴⁸</td><td class="px-6 py-4 text-yellow-400">An toàn nhưng kích thước khối nhỏ là điểm yếu.</td></tr>
-                        <tr class="bg-gray-800"><th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">RC4</th><td class="px-6 py-4">N/A (Dòng)</td><td class="px-6 py-4 font-mono">Lên tới 2²⁰⁴⁸</td><td class="px-6 py-4 text-red-400">Nhiều lỗ hổng nghiêm trọng.</td></tr>
+                        <tr class="bg-gray-800 border-b border-gray-700">
+                            <th scope="row" class="px-6 py-4 font-bold text-lg text-green-400">AES</th>
+                            <td class="px-6 py-4">128 bit</td>
+                            <td class="px-6 py-4 font-mono">2¹²⁸</td>
+                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
+                            <td class="px-6 py-4 text-green-400">"Tiêu chuẩn vàng" toàn cầu.</td>
+                        </tr>
+                        <tr class="bg-gray-800 border-b border-gray-700">
+                            <th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">DES</th>
+                            <td class="px-6 py-4">64 bit</td>
+                            <td class="px-6 py-4 font-mono">2⁵⁶</td>
+                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
+                            <td class="px-6 py-4 text-red-400">Hoàn toàn không an toàn.</td>
+                        </tr>
+                        <tr class="bg-gray-800 border-b border-gray-700">
+                            <th scope="row" class="px-6 py-4 font-bold text-lg text-yellow-400">Blowfish</th>
+                            <td class="px-6 py-4">64 bit</td>
+                            <td class="px-6 py-4 font-mono">Lên tới 2⁴⁴⁸</td>
+                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
+                            <td class="px-6 py-4 text-yellow-400">An toàn nhưng kích thước khối nhỏ là điểm yếu.</td>
+                        </tr>
+                        <tr class="bg-gray-800">
+                            <th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">RC4</th>
+                            <td class="px-6 py-4">N/A (Dòng)</td>
+                            <td class="px-6 py-4 font-mono">Lên tới 2²⁰⁴⁸</td>
+                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
+                            <td class="px-6 py-4 text-red-400">Nhiều lỗ hổng nghiêm trọng.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
