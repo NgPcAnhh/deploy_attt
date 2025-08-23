@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minh Họa Mật Mã Học</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .key-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .key-icon:hover {
+            transform: rotate(15deg);
+        }
+        .lock-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .lock-icon:hover {
+            transform: scale(1.1);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl mx-auto">
+        <!-- Main Demo Section -->
+        <div class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-cyan-400 mb-6">Minh Họa Quá Trình Mã Hóa</h1>
+            <p class="text-center text-gray-300 mb-8">Nhập văn bản vào ô "Bản rõ", sau đó nhấn nút để xem điều kỳ diệu xảy ra!</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <!-- Plaintext Input -->
+                <div class="flex flex-col space-y-2">
+                    <label for="plaintext" class="text-lg font-semibold text-gray-200">Bản rõ (Plaintext)</label>
+                    <textarea id="plaintext" rows="8" class="w-full p-4 bg-gray-700 border-2 border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-300" placeholder="Nhập thông điệp bí mật của bạn ở đây..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <button id="encryptBtn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform hover:scale-105 shadow-lg">
+                        <svg class="w-6 h-6 mr-2 lock-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Mã Hóa
+                    </button>
+                    <div class="text-gray-400 text-2xl font-mono">&rarr;</div>
+                    <button id="decryptBtn" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 transform hover:scale-105 shadow-lg">
+                        <svg class="w-6 h-6 mr-2 key-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H5v-2H3v-2H1v-4a6 6 0 017.743-5.743z"></path></svg>
+                        Giải Mã
+                    </button>
+                    <div class="text-gray-400 text-2xl font-mono">&larr;</div>
+                </div>
+
+                <!-- Ciphertext Output -->
+                <div class="flex flex-col space-y-2">
+                    <label for="ciphertext" class="text-lg font-semibold text-gray-200">Bản mã (Ciphertext)</label>
+                    <textarea id="ciphertext" rows="8" class="w-full p-4 bg-gray-700 border-2 border-gray-600 rounded-lg text-gray-400 font-mono focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300" placeholder="Thông tin đã được xáo trộn..." readonly></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Definitions Section -->
+        <div class="card rounded-2xl shadow-xl p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-center text-cyan-300 mb-6">Các Khái Niệm Cơ Bản</h2>
+            <div class="space-y-4 text-gray-300 leading-relaxed">
+                <p><strong class="text-white">Mật mã:</strong> Là những quy tắc, quy ước riêng dùng để thay đổi hình thức biểu hiện thông tin nhằm bảo đảm bí mật, xác thực, toàn vẹn của nội dung thông tin.</p>
+                <p><strong class="text-white">Bản rõ (Plaintext):</strong> Hay thông tin chưa mã hóa (Unencrypted information) là thông tin ở dạng có thể hiểu được. Nó có thể ở dạng văn bản, hình ảnh, video hoặc bất kỳ định dạng khác. Bản rõ có thể dễ dàng đọc và hiểu bởi bất kỳ ai có quyền truy cập vào nó nên nó cần được che dấu và bảo vệ.</p>
+                <p><strong class="text-white">Bản mã (Ciphertext):</strong> Hay thông tin đã được mã hóa (Encrypted information) là thông tin ở dạng đã bị xáo trộn.</p>
+                <p><strong class="text-white">Mã hóa (Encryption):</strong> Là hành động xáo trộn (scrambling) bản rõ để chuyển thành bản mã.</p>
+                <p><strong class="text-white">Giải mã (Decryption):</strong> Là hành động giải xáo trộn (unscrambling) bản mã để chuyển thành bản rõ.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const plaintextInput = document.getElementById('plaintext');
+        const ciphertextInput = document.getElementById('ciphertext');
+        const encryptBtn = document.getElementById('encryptBtn');
+        const decryptBtn = document.getElementById('decryptBtn');
+
+        // This is a simple Caesar Cipher for demonstration
+        const shift = 13; // A common shift value (ROT13)
+        const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789àáâãèéêìíòóôõùúýăđĩũơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ';
+
+        /**
+         * Animates text appearing in a textarea element
+         * @param {HTMLTextAreaElement} element - The textarea to animate.
+         * @param {string} text - The text to display.
+         * @param {number} delay - The delay between characters in ms.
+         */
+        function animateText(element, text, delay = 10) {
+            let i = 0;
+            element.value = '';
+            const interval = setInterval(() => {
+                if (i < text.length) {
+                    element.value += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, delay);
+        }
+
+        /**
+         * Transforms text using the cipher logic.
+         * @param {string} inputText - The text to transform.
+         * @param {string} mode - 'encrypt' or 'decrypt'.
+         * @returns {string} - The transformed text.
+         */
+        function transformText(inputText, mode) {
+            let outputText = '';
+            for (let i = 0; i < inputText.length; i++) {
+                const char = inputText[i];
+                const index = alphabet.indexOf(char);
+
+                if (index === -1) {
+                    // If character is not in our alphabet (like spaces, punctuation), keep it as is.
+                    outputText += char;
+                } else {
+                    let newIndex;
+                    if (mode === 'encrypt') {
+                        newIndex = (index + shift) % alphabet.length;
+                    } else { // decrypt
+                        newIndex = (index - shift + alphabet.length) % alphabet.length;
+                    }
+                    outputText += alphabet[newIndex];
+                }
+            }
+            return outputText;
+        }
+
+        // Event listener for the Encrypt button
+        encryptBtn.addEventListener('click', () => {
+            const text = plaintextInput.value;
+            if (text) {
+                const encryptedText = transformText(text, 'encrypt');
+                animateText(ciphertextInput, encryptedText);
+            } else {
+                ciphertextInput.value = '';
+                alert('Vui lòng nhập bản rõ để mã hóa.');
+            }
+        });
+
+        // Event listener for the Decrypt button
+        decryptBtn.addEventListener('click', () => {
+            const text = ciphertextInput.value;
+            if (text) {
+                const decryptedText = transformText(text, 'decrypt');
+                animateText(plaintextInput, decryptedText);
+            } else {
+                plaintextInput.value = '';
+                alert('Không có bản mã để giải mã.');
+            }
+        });
+    </script>
+
+</body>
+</html>
