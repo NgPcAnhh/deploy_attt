@@ -6,6 +6,10 @@
     <title>So Sánh Các Thuật Toán Mã Hóa Bất Đối Xứng</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Crypto Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -16,7 +20,12 @@
             height: 350px;
             width: 100%;
         }
-        .processing-bar {
+        .status-box {
+            height: 150px; /* Fixed height for consistency */
+            overflow-y: auto;
+            word-break: break-all;
+        }
+        .progress-bar {
             transition: width 0.5s ease-in-out;
         }
     </style>
@@ -51,18 +60,30 @@
         <!-- Input and Visualization Trigger -->
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10 border border-gray-700">
              <div class="flex flex-col md:flex-row gap-4">
-                <textarea id="plaintext" class="w-full p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" rows="3" placeholder="Nhập văn bản để mô phỏng quá trình mã hóa..."></textarea>
-                <button id="runBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 shadow-md flex-shrink-0 disabled:opacity-50 disabled:cursor-wait">
-                    Thực hiện & Phân tích
-                </button>
-            </div>
+                 <textarea id="plaintext" class="w-full p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" rows="3" placeholder="Nhập văn bản để thực hiện mã hóa..."></textarea>
+                 <button id="runBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 shadow-md flex-shrink-0 disabled:opacity-50 disabled:cursor-wait">
+                     Thực hiện & Phân tích
+                 </button>
+             </div>
         </div>
         
         <!-- Visualization Section -->
         <div id="visualization-section" class="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
-             <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold text-blue-400 mb-4">Mô phỏng RSA</h3><div id="rsa-vis" class="w-full bg-gray-700 rounded-full h-4"><div class="processing-bar bg-blue-500 h-4 rounded-full" style="width: 0%"></div></div><p id="rsa-status" class="text-xs text-center mt-2 text-gray-400">Chờ...</p></div>
-             <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold text-green-400 mb-4">Mô phỏng ECC</h3><div id="ecc-vis" class="w-full bg-gray-700 rounded-full h-4"><div class="processing-bar bg-green-500 h-4 rounded-full" style="width: 0%"></div></div><p id="ecc-status" class="text-xs text-center mt-2 text-gray-400">Chờ...</p></div>
-             <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold text-purple-400 mb-4">Mô phỏng Elgamal</h3><div id="elgamal-vis" class="w-full bg-gray-700 rounded-full h-4"><div class="processing-bar bg-purple-500 h-4 rounded-full" style="width: 0%"></div></div><p id="elgamal-status" class="text-xs text-center mt-2 text-gray-400">Chờ...</p></div>
+            <div class="bg-gray-800 p-6 rounded-2xl">
+                <h3 class="text-xl font-bold text-blue-400 mb-2">Kết quả RSA</h3>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-4"><div id="rsa-progress" class="progress-bar bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div></div>
+                <div id="rsa-status" class="status-box text-xs text-gray-400 bg-gray-900 p-2 rounded-md font-mono">Chờ thực thi...</div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-2xl">
+                <h3 class="text-xl font-bold text-green-400 mb-2">Kết quả ECC</h3>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-4"><div id="ecc-progress" class="progress-bar bg-green-500 h-2.5 rounded-full" style="width: 0%"></div></div>
+                <div id="ecc-status" class="status-box text-xs text-gray-400 bg-gray-900 p-2 rounded-md font-mono">Chờ thực thi...</div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-2xl">
+                <h3 class="text-xl font-bold text-purple-400 mb-2">Kết quả Elgamal</h3>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-4"><div id="elgamal-progress" class="progress-bar bg-purple-500 h-2.5 rounded-full" style="width: 0%"></div></div>
+                <div id="elgamal-status" class="status-box text-xs text-gray-400 bg-gray-900 p-2 rounded-md font-mono">Chờ thực thi...</div>
+            </div>
         </div>
 
         <!-- Comparison Dashboard Section -->
@@ -71,9 +92,11 @@
             <div id="dashboard-placeholder" class="text-center text-gray-500 py-10"><p>Nhập văn bản và nhấn "Thực hiện & Phân tích" để tạo biểu đồ.</p></div>
             <div id="dashboard-content" class="grid grid-cols-1 md:grid-cols-2 gap-8 hidden">
                 <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Phân tích Hiệu năng Tác vụ</h3><p class="text-sm text-gray-400 mb-6">So sánh tốc độ tương đối cho các tác vụ chính. Vùng bao phủ càng lớn, hiệu năng càng cao.</p><div class="chart-container"><canvas id="taskPerformanceChart"></canvas></div></div>
-                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Hiệu năng Mô phỏng (ms)</h3><p class="text-sm text-gray-400 mb-6">Thời gian mô phỏng quá trình mã hóa. Cột càng ngắn, hiệu năng càng cao.</p><div class="chart-container"><canvas id="performanceChart"></canvas></div></div>
-                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Kích thước khóa cho cùng độ an toàn</h3><p class="text-sm text-gray-400 mb-6">So sánh độ dài khóa (bit) cần thiết để đạt mức an toàn tương đương.</p><div class="chart-container"><canvas id="keySizeChart"></canvas></div></div>
                 <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Ứng dụng và Mức độ Phổ biến</h3><p class="text-sm text-gray-400 mb-6">Phân bổ các lĩnh vực ứng dụng chính của từng thuật toán.</p><div class="chart-container"><canvas id="useCaseChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Thời gian Tạo khóa (ms)</h3><p class="text-sm text-gray-400 mb-6">Thời gian để tạo cặp khóa công khai/bí mật. Càng thấp càng tốt.</p><div class="chart-container"><canvas id="keyGenChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Thời gian Mã hóa (ms)</h3><p class="text-sm text-gray-400 mb-6">Thời gian để mã hóa văn bản đầu vào. Càng thấp càng tốt.</p><div class="chart-container"><canvas id="encryptionChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Thời gian Giải mã (ms)</h3><p class="text-sm text-gray-400 mb-6">Thời gian để giải mã văn bản đã mã hóa. Càng thấp càng tốt.</p><div class="chart-container"><canvas id="decryptionChart"></canvas></div></div>
+                <div class="bg-gray-800 p-6 rounded-2xl"><h3 class="text-xl font-bold mb-4 text-white">Kích thước khóa cho cùng độ an toàn</h3><p class="text-sm text-gray-400 mb-6">So sánh độ dài khóa (bit) cần thiết để đạt mức an toàn tương đương.</p><div class="chart-container"><canvas id="keySizeChart"></canvas></div></div>
             </div>
         </div>
         
@@ -96,50 +119,171 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
             const plaintextInput = document.getElementById('plaintext');
             const runBtn = document.getElementById('runBtn');
             const dashboardPlaceholder = document.getElementById('dashboard-placeholder');
             const dashboardContent = document.getElementById('dashboard-content');
             const visualizationSection = document.getElementById('visualization-section');
-            
-            const algorithms = {
-                rsa: { name: 'RSA', perfFactor: 1.2, visBar: document.querySelector('#rsa-vis .processing-bar'), statusEl: document.getElementById('rsa-status') },
-                ecc: { name: 'ECC', perfFactor: 0.8, visBar: document.querySelector('#ecc-vis .processing-bar'), statusEl: document.getElementById('ecc-status') },
-                elgamal: { name: 'Elgamal', perfFactor: 1.8, visBar: document.querySelector('#elgamal-vis .processing-bar'), statusEl: document.getElementById('elgamal-status') }
+            const statusElements = {
+                rsa: document.getElementById('rsa-status'),
+                ecc: document.getElementById('ecc-status'),
+                elgamal: document.getElementById('elgamal-status')
             };
-
+            const progressElements = {
+                rsa: document.getElementById('rsa-progress'),
+                ecc: document.getElementById('ecc-progress'),
+                elgamal: document.getElementById('elgamal-progress')
+            };
+            
             let charts = {};
 
-            async function simulateProcessing(algo, textLength) {
-                const baseTime = 500;
-                const totalTime = baseTime + (textLength * algo.perfFactor);
-                const startTime = performance.now();
-                
-                algo.statusEl.textContent = 'Đang xử lý...';
-                algo.visBar.style.width = '0%';
+            // --- Utility Functions ---
+            const timer = async (fn) => {
+                const start = performance.now();
+                const result = await fn();
+                const end = performance.now();
+                return { result, time: end - start };
+            };
 
-                const interval = setInterval(() => {
-                    const elapsed = performance.now() - startTime;
-                    const width = (elapsed / totalTime) * 100;
-                    algo.visBar.style.width = `${Math.min(width, 100)}%`;
-                    if (elapsed >= totalTime) {
-                        clearInterval(interval);
-                    }
-                }, 50);
+            const updateStatus = (algo, message) => {
+                statusElements[algo].innerHTML += message + '<br>';
+                statusElements[algo].scrollTop = statusElements[algo].scrollHeight;
+            };
+            
+            const updateProgress = (algo, stage) => { // stage 1, 2, 3
+                const percentage = (stage / 3) * 100;
+                progressElements[algo].style.width = `${percentage}%`;
+            };
 
-                return new Promise(resolve => setTimeout(() => {
-                     clearInterval(interval);
-                     algo.visBar.style.width = '100%';
-                     const finalTime = performance.now() - startTime;
-                     algo.statusEl.textContent = `Hoàn thành sau ${finalTime.toFixed(0)} ms`;
-                     resolve({ name: algo.name, time: finalTime });
-                }, totalTime));
+            const clearStatusAndProgress = () => {
+                Object.values(statusElements).forEach(el => el.textContent = 'Đang xử lý...');
+                Object.values(progressElements).forEach(el => el.style.width = '0%');
             }
 
+            // --- Cryptographic Implementations ---
+            const CryptoProcessor = {
+                // RSA implementation using JSEncrypt
+                rsa: async (plaintext) => {
+                    const crypt = new JSEncrypt({ default_key_size: 2048 });
+
+                    const keyGen = await timer(() => crypt.getKey());
+                    updateStatus('rsa', `Tạo khóa: ${keyGen.time.toFixed(2)} ms`);
+                    updateProgress('rsa', 1);
+
+                    const encryption = await timer(() => crypt.encrypt(plaintext));
+                    const ciphertext = encryption.result;
+                    if (!ciphertext) throw new Error("RSA Encryption failed. Message might be too long.");
+                    updateStatus('rsa', `Mã hóa: ${encryption.time.toFixed(2)} ms`);
+                    updateStatus('rsa', `Bản mã: ${ciphertext.substring(0, 40)}...`);
+                    updateProgress('rsa', 2);
+                    
+                    const decryption = await timer(() => crypt.decrypt(ciphertext));
+                    updateStatus('rsa', `Giải mã: ${decryption.time.toFixed(2)} ms`);
+                    updateStatus('rsa', `Bản rõ: ${decryption.result}`);
+                    updateProgress('rsa', 3);
+
+                    return { keyGen: keyGen.time, encryption: encryption.time, decryption: decryption.time };
+                },
+
+                // ECC implementation using elliptic.js and AES from crypto-js (ECIES scheme)
+                ecc: async (plaintext) => {
+                    const ec = new elliptic.ec('secp256k1');
+                    
+                    const keyGen = await timer(() => ec.genKeyPair());
+                    const keyA = keyGen.result;
+                    updateStatus('ecc', `Tạo khóa: ${keyGen.time.toFixed(2)} ms`);
+                    updateProgress('ecc', 1);
+
+                    const encryption = await timer(() => {
+                        const keyB = ec.genKeyPair();
+                        const sharedSecret = keyA.derive(keyB.getPublic());
+                        const key = CryptoJS.SHA256(sharedSecret.toString(16)).toString(CryptoJS.enc.Hex).substring(0, 32);
+                        const iv = CryptoJS.lib.WordArray.random(16);
+                        const encrypted = CryptoJS.AES.encrypt(plaintext, CryptoJS.enc.Hex.parse(key), { iv: iv });
+                        return { ephemPublicKey: keyB.getPublic('hex'), iv: iv.toString(CryptoJS.enc.Hex), ciphertext: encrypted.toString() };
+                    });
+                    updateStatus('ecc', `Mã hóa: ${encryption.time.toFixed(2)} ms`);
+                    updateStatus('ecc', `Bản mã: ${encryption.result.ciphertext.substring(0, 40)}...`);
+                    updateProgress('ecc', 2);
+
+                    const decryption = await timer(() => {
+                        const { ephemPublicKey, iv, ciphertext } = encryption.result;
+                        const keyBPub = ec.keyFromPublic(ephemPublicKey, 'hex');
+                        const sharedSecret = keyA.derive(keyBPub.getPublic());
+                        const key = CryptoJS.SHA256(sharedSecret.toString(16)).toString(CryptoJS.enc.Hex).substring(0, 32);
+                        const decrypted = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Hex.parse(key), { iv: CryptoJS.enc.Hex.parse(iv) });
+                        return decrypted.toString(CryptoJS.enc.Utf8);
+                    });
+                    updateStatus('ecc', `Giải mã: ${decryption.time.toFixed(2)} ms`);
+                    updateStatus('ecc', `Bản rõ: ${decryption.result}`);
+                    updateProgress('ecc', 3);
+
+                    return { keyGen: keyGen.time, encryption: encryption.time, decryption: decryption.time };
+                },
+
+                // Elgamal implementation using native BigInt
+                elgamal: async (plaintext) => {
+                    const power = (base, exp, mod) => {
+                        let res = 1n; base %= mod;
+                        while (exp > 0) {
+                            if (exp % 2n === 1n) res = (res * base) % mod;
+                            base = (base * base) % mod; exp /= 2n;
+                        }
+                        return res;
+                    };
+                    const textToBigInt = (text) => BigInt('0x' + Array.from(text).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+                    const bigIntToText = (bigint) => {
+                        let hex = bigint.toString(16);
+                        if (hex.length % 2 !== 0) hex = '0' + hex;
+                        let text = '';
+                        for (let i = 0; i < hex.length; i += 2) text += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                        try { return decodeURIComponent(escape(text)); } catch (e) { return text; }
+                    };
+
+                    let keyData;
+                    const keyGen = await timer(() => {
+                        const p = 2n**256n - 2n**224n + 2n**192n + 2n**96n - 1n; 
+                        const g = 2n;
+                        const x = BigInt('0x' + CryptoJS.lib.WordArray.random(32).toString());
+                        const y = power(g, x, p);
+                        return { p, g, y, x };
+                    });
+                    keyData = keyGen.result;
+                    updateStatus('elgamal', `Tạo khóa: ${keyGen.time.toFixed(2)} ms`);
+                    updateProgress('elgamal', 1);
+
+                    const encryption = await timer(() => {
+                        const M = textToBigInt(plaintext);
+                        if (M >= keyData.p) throw new Error("Message too long for Elgamal prime.");
+                        const k = BigInt('0x' + CryptoJS.lib.WordArray.random(32).toString());
+                        const a = power(keyData.g, k, keyData.p);
+                        const b = (power(keyData.y, k, keyData.p) * M) % keyData.p;
+                        return { a, b };
+                    });
+                    updateStatus('elgamal', `Mã hóa: ${encryption.time.toFixed(2)} ms`);
+                    updateStatus('elgamal', `Bản mã (a): ${encryption.result.a.toString().substring(0, 20)}...`);
+                    updateProgress('elgamal', 2);
+
+                    const decryption = await timer(() => {
+                        const { a, b } = encryption.result;
+                        const s = power(a, keyData.x, keyData.p);
+                        const s_inv = power(s, keyData.p - 2n, keyData.p);
+                        const M_decrypted = (b * s_inv) % keyData.p;
+                        return bigIntToText(M_decrypted);
+                    });
+                    updateStatus('elgamal', `Giải mã: ${decryption.time.toFixed(2)} ms`);
+                    updateStatus('elgamal', `Bản rõ: ${decryption.result}`);
+                    updateProgress('elgamal', 3);
+
+                    return { keyGen: keyGen.time, encryption: encryption.time, decryption: decryption.time };
+                }
+            };
+
+            // --- Chart Rendering ---
             function renderDashboards(performanceData) {
                 dashboardPlaceholder.classList.add('hidden');
                 dashboardContent.classList.remove('hidden');
-
                 Object.values(charts).forEach(chart => chart.destroy());
 
                 // --- Task Performance Chart (Radar) ---
@@ -156,31 +300,49 @@
                     },
                     options: {
                         scales: { r: { angleLines: { color: '#4b5563' }, grid: { color: '#4b5563' }, pointLabels: { color: '#d1d5db' }, ticks: { display: false, beginAtZero: true } } },
-                        plugins: { legend: { labels: { color: '#d1d5db' } }, tooltip: { callbacks: { afterLabel: (c) => 'Điểm càng cao, hiệu năng tương đối càng tốt cho tác vụ đó.' } } },
+                        plugins: { legend: { labels: { color: '#d1d5db' } }, tooltip: { callbacks: { afterLabel: () => 'Điểm càng cao, hiệu năng tương đối càng tốt.' } } },
                         responsive: true, maintainAspectRatio: false
                     }
                 });
-
-                // --- Simulated Performance Chart (Bar) ---
-                const perfCtx = document.getElementById('performanceChart').getContext('2d');
-                charts.performance = new Chart(perfCtx, {
-                    type: 'bar',
+                
+                // --- Use Case Chart (Doughnut) ---
+                const useCaseCtx = document.getElementById('useCaseChart').getContext('2d');
+                charts.useCase = new Chart(useCaseCtx, {
+                    type: 'doughnut',
                     data: {
-                        labels: performanceData.map(d => d.name),
-                        datasets: [{
-                            label: 'Thời gian mô phỏng (ms)',
-                            data: performanceData.map(d => d.time),
-                            backgroundColor: ['#60a5fa', '#34d399', '#c084fc']
-                        }]
+                        labels: ['Web & Doanh nghiệp (TLS, VPN)', 'Mobile, IoT, Tiền điện tử', 'Học thuật & Chuyên dụng'],
+                        datasets: [{ data: [65, 30, 5], backgroundColor: ['#60a5fa', '#34d399', '#c084fc'], hoverOffset: 4 }]
                     },
                     options: {
-                        scales: { y: { ticks: { color: '#d1d5db' } }, x: { ticks: { color: '#d1d5db' } } },
-                        plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (c) => 'Càng thấp càng tốt (hiệu năng cao hơn).' } } },
+                        plugins: { legend: { position: 'top', labels: { color: '#d1d5db' } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%` } } },
                         responsive: true, maintainAspectRatio: false
                     }
                 });
 
-                // --- Key Size Chart (Bar) ---
+                const createBarChart = (canvasId, label, data) => {
+                    const ctx = document.getElementById(canvasId).getContext('2d');
+                    return new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['RSA', 'ECC', 'Elgamal'],
+                            datasets: [{
+                                label: label,
+                                data: data,
+                                backgroundColor: ['#60a5fa', '#34d399', '#c084fc']
+                            }]
+                        },
+                        options: {
+                            scales: { y: { ticks: { color: '#d1d5db' }, grid: { color: '#4b5563' } }, x: { ticks: { color: '#d1d5db' }, grid: { color: '#4b5563' } } },
+                            plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: () => 'Càng thấp càng tốt (hiệu năng cao hơn).' } } },
+                            responsive: true, maintainAspectRatio: false
+                        }
+                    });
+                };
+                
+                charts.keyGen = createBarChart('keyGenChart', 'Thời gian tạo khóa (ms)', [performanceData.rsa.keyGen, performanceData.ecc.keyGen, performanceData.elgamal.keyGen]);
+                charts.encryption = createBarChart('encryptionChart', 'Thời gian mã hóa (ms)', [performanceData.rsa.encryption, performanceData.ecc.encryption, performanceData.elgamal.encryption]);
+                charts.decryption = createBarChart('decryptionChart', 'Thời gian giải mã (ms)', [performanceData.rsa.decryption, performanceData.ecc.decryption, performanceData.elgamal.decryption]);
+
                 const keySizeCtx = document.getElementById('keySizeChart').getContext('2d');
                 charts.keySize = new Chart(keySizeCtx, {
                     type: 'bar',
@@ -192,48 +354,47 @@
                         ]
                     },
                     options: {
-                        scales: { y: { type: 'logarithmic', ticks: { color: '#d1d5db' } }, x: { ticks: { color: '#d1d5db' } } },
-                        plugins: { legend: { labels: { color: '#d1d5db' } }, tooltip: { callbacks: { afterLabel: (c) => 'ECC cần khóa ngắn hơn đáng kể để đạt cùng độ an toàn. Càng ngắn càng hiệu quả.' } } },
-                        responsive: true, maintainAspectRatio: false
-                    }
-                });
-
-                // --- Use Case Chart (Doughnut) ---
-                const useCaseCtx = document.getElementById('useCaseChart').getContext('2d');
-                charts.useCase = new Chart(useCaseCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Web & Doanh nghiệp (TLS, VPN)', 'Mobile, IoT, Tiền điện tử', 'Học thuật & Chuyên dụng'],
-                        datasets: [{ data: [65, 30, 5], backgroundColor: ['#60a5fa', '#34d399', '#c084fc'], hoverOffset: 4 }]
-                    },
-                    options: {
-                        plugins: { legend: { position: 'top', labels: { color: '#d1d5db' } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%`, afterLabel: (c) => 'RSA và ECC thống trị các ứng dụng thương mại.' } } },
+                        scales: { y: { type: 'logarithmic', ticks: { color: '#d1d5db' }, grid: { color: '#4b5563' } }, x: { ticks: { color: '#d1d5db' }, grid: { color: '#4b5563' } } },
+                        plugins: { legend: { labels: { color: '#d1d5db' } }, tooltip: { callbacks: { afterLabel: () => 'ECC cần khóa ngắn hơn đáng kể.' } } },
                         responsive: true, maintainAspectRatio: false
                     }
                 });
             }
 
+            // --- Main Event Listener ---
             runBtn.addEventListener('click', async () => {
                 const text = plaintextInput.value;
                 if (!text) {
-                    alert('Vui lòng nhập văn bản để bắt đầu mô phỏng.');
+                    alert('Vui lòng nhập văn bản để bắt đầu.');
                     return;
                 }
                 
                 runBtn.disabled = true;
                 runBtn.textContent = 'Đang xử lý...';
                 visualizationSection.classList.remove('hidden');
-                dashboardContent.classList.add('hidden');
-                dashboardPlaceholder.classList.remove('hidden');
+                clearStatusAndProgress();
 
-                const simulationPromises = Object.values(algorithms).map(algo => simulateProcessing(algo, text.length));
-                
-                const performanceResults = await Promise.all(simulationPromises);
-                
-                renderDashboards(performanceResults);
+                try {
+                    const [rsaResults, eccResults, elgamalResults] = await Promise.all([
+                        CryptoProcessor.rsa(text),
+                        CryptoProcessor.ecc(text),
+                        CryptoProcessor.elgamal(text)
+                    ]);
+                    
+                    renderDashboards({
+                        rsa: rsaResults,
+                        ecc: eccResults,
+                        elgamal: elgamalResults
+                    });
 
-                runBtn.disabled = false;
-                runBtn.textContent = 'Thực hiện & Phân tích';
+                } catch (error) {
+                    console.error("Crypto processing error:", error);
+                    alert("Đã xảy ra lỗi trong quá trình mã hóa: " + error.message);
+                     Object.values(statusElements).forEach(el => el.textContent = 'Lỗi! Kiểm tra console.');
+                } finally {
+                    runBtn.disabled = false;
+                    runBtn.textContent = 'Thực hiện & Phân tích';
+                }
             });
         });
     </script>
