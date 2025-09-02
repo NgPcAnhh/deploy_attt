@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>So Sánh Các Thuật Toán Mã Hóa</title>
+    <title>So Sánh Thuật Toán Mã Hóa Thực Tế</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -18,14 +19,18 @@
         .algo-card {
             border: 1px solid #374151;
         }
-        .data-block, .data-stream-char {
+        .data-block {
             display: inline-block;
-            padding: 4px 6px;
+            padding: 4px 8px;
             margin: 2px;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.75rem;
             text-align: center;
-            transition: background-color 0.5s, color 0.5s;
+            transition: all 0.3s ease;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .plaintext-block {
             background-color: #374151;
@@ -33,14 +38,30 @@
             border: 1px solid #4b5563;
         }
         .encrypted-block {
-            background-color: #0e7490;
+            background-color: #059669;
             color: #ffffff;
             font-weight: 500;
+            border: 1px solid #047857;
         }
         .chart-container {
             position: relative;
-            height: 350px;
+            height: 300px;
             width: 100%;
+        }
+        .performance-metric {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            border: 1px solid #4b5563;
+            transition: transform 0.2s ease;
+        }
+        .performance-metric:hover {
+            transform: translateY(-2px);
+        }
+        .processing {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
         }
     </style>
 </head>
@@ -48,126 +69,146 @@
 
     <div class="max-w-7xl mx-auto">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-cyan-400">Trực Quan Hóa & Phân Tích Thuật Toán Mã Hóa</h1>
-            <p class="text-gray-400 mt-2">Tìm hiểu, trực quan hóa và phân tích hiệu quả của các thuật toán mã hóa kinh điển.</p>
+            <h1 class="text-4xl font-bold text-cyan-400">Phân Tích Hiệu Năng Thuật Toán Mã Hóa Thực Tế</h1>
+            <p class="text-gray-400 mt-2">Thực hiện mã hóa thực tế và đo lường các chỉ tiêu hiệu năng chi tiết.</p>
         </header>
 
         <!-- Algorithm Explanations Section -->
         <div class="mb-12">
-            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Tìm Hiểu Nhanh Về Các Thuật Toán</h2>
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Tìm Hiểu Về Các Thuật Toán</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- DES Explanation -->
+                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                    <h3 class="text-xl font-bold text-green-400 mb-2">AES-256</h3>
+                    <p class="text-sm text-gray-300">Thuật toán mã hóa khối tiêu chuẩn hiện tại, sử dụng khóa 256-bit với 14 vòng mã hóa. Được sử dụng rộng rãi trong các ứng dụng bảo mật cao.</p>
+                </div>
                 <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
                     <h3 class="text-xl font-bold text-red-400 mb-2">DES</h3>
-                    <p class="text-sm text-gray-300">"Người tiên phong" trong mã hóa khối, xử lý dữ liệu theo khối 64-bit với khóa 56-bit. Khóa quá ngắn này khiến DES không còn an toàn trước các cuộc tấn công hiện đại.</p>
+                    <p class="text-sm text-gray-300">Thuật toán mã hóa khối cổ điển, sử dụng khóa 56-bit. Hiện không còn an toàn do khóa quá ngắn, dễ bị tấn công vét cạn.</p>
                 </div>
-                <!-- AES Explanation -->
                 <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                    <h3 class="text-xl font-bold text-green-400 mb-2">AES</h3>
-                    <p class="text-sm text-gray-300">"Nhà vô địch" hiện đại, xử lý khối 128-bit với các khóa dài (128/192/256 bit), khiến tấn công vét cạn bất khả thi. Đây là tiêu chuẩn vàng cho bảo mật ngày nay.</p>
+                    <h3 class="text-xl font-bold text-blue-400 mb-2">3DES</h3>
+                    <p class="text-sm text-gray-300">Cải tiến của DES, thực hiện mã hóa 3 lần liên tiếp với khóa 168-bit. An toàn hơn DES nhưng chậm và đang bị thay thế bởi AES.</p>
                 </div>
-                <!-- Blowfish Explanation -->
-                <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                    <h3 class="text-xl font-bold text-yellow-400 mb-2">Blowfish</h3>
-                    <p class="text-sm text-gray-300">Một thuật toán khối nhanh và miễn phí, dùng khối 64-bit và khóa linh hoạt (tới 448 bit). Dù thuật toán mạnh, kích thước khối nhỏ là một điểm yếu khi mã hóa lượng dữ liệu lớn.</p>
-                </div>
-                <!-- RC4 Explanation -->
                 <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
                     <h3 class="text-xl font-bold text-purple-400 mb-2">RC4</h3>
-                    <p class="text-sm text-gray-300">Một thuật toán mã hóa dòng, xử lý từng byte thay vì theo khối. Từng rất nhanh và phổ biến, nhưng các lỗ hổng nghiêm trọng trong thuật toán khiến nó không còn an toàn.</p>
+                    <p class="text-sm text-gray-300">Thuật toán mã hóa dòng, từng được sử dụng trong SSL/WEP. Có nhiều lỗ hổng bảo mật nghiêm trọng và không được khuyến nghị sử dụng.</p>
                 </div>
             </div>
         </div>
 
+        <!-- Input Section -->
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8 sticky top-4 z-10 border border-gray-700">
-            <div class="flex flex-col md:flex-row gap-4">
-                <textarea id="plaintext" class="w-full p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" rows="3" placeholder="Nhập văn bản càng dài, sự khác biệt về hiệu năng càng rõ..."></textarea>
-                <button id="encryptBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 shadow-md flex-shrink-0 disabled:opacity-50 disabled:cursor-wait">
-                    Trực Quan Hóa
-                </button>
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <textarea id="plaintext" class="flex-1 p-3 bg-gray-900 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition font-mono" rows="3" placeholder="Nhập dữ liệu cần mã hóa (văn bản càng dài, phép đo càng chính xác)...">Hello World! This is a test message for encryption performance analysis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</textarea>
+                    <button id="encryptBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 shadow-md flex-shrink-0 disabled:opacity-50 disabled:cursor-wait">
+                        Thực Hiện Mã Hóa
+                    </button>
+                </div>
+                <div class="text-sm text-gray-400">
+                    <span id="inputStats">Độ dài: 0 ký tự, 0 bytes</span>
+                </div>
             </div>
         </div>
 
         <!-- Visualization Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-            <!-- Cards for AES, DES, Blowfish, RC4 -->
-            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">AES (Rijndael)</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa khối</li><li><strong>Kích thước khối:</strong> 128 bit</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="aes-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
-            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">DES</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa khối</li><li><strong>Kích thước khối:</strong> 64 bit</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="des-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
-            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">Blowfish</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa khối</li><li><strong>Kích thước khối:</strong> 64 bit</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="blowfish-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
-            <div class="algo-card bg-gray-800 rounded-2xl p-6"> <h2 class="text-2xl font-bold text-white mb-4">RC4</h2> <ul class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4"><li><strong>Loại:</strong> Mã hóa dòng</li></ul> <h3 class="font-semibold mb-2">Minh họa quá trình:</h3><div id="rc4-vis" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[80px] font-mono text-xs leading-relaxed break-all"></div> </div>
+            <div class="algo-card bg-gray-800 rounded-2xl p-6">
+                <h2 class="text-2xl font-bold text-green-400 mb-4">AES-256</h2>
+                <div class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4">
+                    <div><strong>Loại:</strong> Mã hóa khối</div>
+                    <div><strong>Kích thước khối:</strong> 128 bit (16 bytes)</div>
+                    <div><strong>Độ dài khóa:</strong> 256 bit</div>
+                </div>
+                <h3 class="font-semibold mb-2">Kết quả mã hóa:</h3>
+                <div id="aes-result" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[60px] font-mono text-xs break-all"></div>
+            </div>
+
+            <div class="algo-card bg-gray-800 rounded-2xl p-6">
+                <h2 class="text-2xl font-bold text-red-400 mb-4">DES</h2>
+                <div class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4">
+                    <div><strong>Loại:</strong> Mã hóa khối</div>
+                    <div><strong>Kích thước khối:</strong> 64 bit (8 bytes)</div>
+                    <div><strong>Độ dài khóa:</strong> 56 bit</div>
+                </div>
+                <h3 class="font-semibold mb-2">Kết quả mã hóa:</h3>
+                <div id="des-result" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[60px] font-mono text-xs break-all"></div>
+            </div>
+
+            <div class="algo-card bg-gray-800 rounded-2xl p-6">
+                <h2 class="text-2xl font-bold text-blue-400 mb-4">3DES</h2>
+                <div class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4">
+                    <div><strong>Loại:</strong> Mã hóa khối</div>
+                    <div><strong>Kích thước khối:</strong> 64 bit (8 bytes)</div>
+                    <div><strong>Độ dài khóa:</strong> 168 bit</div>
+                </div>
+                <h3 class="font-semibold mb-2">Kết quả mã hóa:</h3>
+                <div id="tripledes-result" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[60px] font-mono text-xs break-all"></div>
+            </div>
+
+            <div class="algo-card bg-gray-800 rounded-2xl p-6">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">RC4</h2>
+                <div class="text-sm text-gray-400 space-y-1 mb-4 border-b border-gray-700 pb-4">
+                    <div><strong>Loại:</strong> Mã hóa dòng</div>
+                    <div><strong>Kích thước khối:</strong> N/A (Stream)</div>
+                    <div><strong>Độ dài khóa:</strong> 128 bit</div>
+                </div>
+                <h3 class="font-semibold mb-2">Kết quả mã hóa:</h3>
+                <div id="rc4-result" class="bg-black bg-opacity-40 p-3 rounded-md min-h-[60px] font-mono text-xs break-all"></div>
+            </div>
         </div>
 
-        <!-- Comparison Dashboard Section -->
-        <div class="mb-12">
-            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Dashboard So Sánh Động</h2>
-            <div id="dashboard-placeholder" class="text-center text-gray-500 py-10">
-                <p>Nhập văn bản và nhấn "Trực Quan Hóa" để tạo biểu đồ.</p>
+        <!-- Performance Metrics Dashboard -->
+        <div class="mb-12" id="performance-section" style="display: none;">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-8">Bảng Điều Khiển Hiệu Năng</h2>
+            
+            <!-- Real-time Performance Metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8" id="metrics-grid">
+                <!-- Metrics will be dynamically populated -->
             </div>
-            <div id="dashboard-content" class="grid grid-cols-1 md:grid-cols-2 gap-8 hidden">
-                <!-- Chart 1: Performance -->
+
+            <!-- Performance Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-gray-800 p-6 rounded-2xl">
-                    <h3 class="text-xl font-bold mb-4 text-white">Hiệu năng Thực tế (ms)</h3>
-                    <p class="text-sm text-gray-400 mb-6">Thời gian hoàn thành quá trình trực quan hóa. Cột càng ngắn, hiệu năng càng cao.</p>
-                    <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+                    <h3 class="text-xl font-bold mb-4 text-white">Tốc Độ Mã Hóa (MB/s)</h3>
+                    <div class="chart-container"><canvas id="speedChart"></canvas></div>
                 </div>
-                <!-- Chart 2: Security Score -->
+
                 <div class="bg-gray-800 p-6 rounded-2xl">
-                    <h3 class="text-xl font-bold mb-4 text-white">Phân tích Tổng quan An ninh</h3>
-                    <p class="text-sm text-gray-400 mb-6">So sánh các chỉ số an ninh quan trọng. Vùng bao phủ càng lớn, thuật toán càng mạnh mẽ.</p>
-                    <div class="chart-container"><canvas id="securityChart"></canvas></div>
+                    <h3 class="text-xl font-bold mb-4 text-white">Thời Gian Xử Lý (ms)</h3>
+                    <div class="chart-container"><canvas id="timeChart"></canvas></div>
                 </div>
-                <!-- Chart 3: Modern Relevance -->
-                <div class="bg-gray-800 p-6 rounded-2xl md:col-span-2">
-                    <h3 class="text-xl font-bold mb-4 text-white">Mức độ Phù hợp & Ứng dụng Hiện đại</h3>
-                    <p class="text-sm text-gray-400 mb-6">Ước tính mức độ tin cậy và thị phần sử dụng trong các ứng dụng ngày nay.</p>
-                    <div class="chart-container h-[250px] md:h-[350px]"><canvas id="relevanceChart"></canvas></div>
+
+                <div class="bg-gray-800 p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4 text-white">Thông Lượng So Sánh</h3>
+                    <div class="chart-container"><canvas id="throughputChart"></canvas></div>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4 text-white">Hiệu Suất CPU & Memory</h3>
+                    <div class="chart-container"><canvas id="resourceChart"></canvas></div>
                 </div>
             </div>
         </div>
-        
-        <!-- Conclusion Table Section -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
-            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-6">Bảng Tổng Kết Chi Tiết</h2>
+
+        <!-- Detailed Results Table -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700" id="results-table" style="display: none;">
+            <h2 class="text-3xl font-bold text-center text-cyan-400 mb-6">Kết Quả Chi Tiết</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left text-gray-300">
                     <thead class="text-xs text-cyan-300 uppercase bg-gray-700">
                         <tr>
-                            <th scope="col" class="px-6 py-3">Thuật toán</th>
-                            <th scope="col" class="px-6 py-3">Kích thước khối</th>
-                            <th scope="col" class="px-6 py-3">Không gian khóa</th>
-                            <th scope="col" class="px-6 py-3">Độ phức tạp</th>
-                            <th scope="col" class="px-6 py-3">Phân tích An ninh</th>
+                            <th class="px-4 py-3">Thuật toán</th>
+                            <th class="px-4 py-3">Tốc độ (MB/s)</th>
+                            <th class="px-4 py-3">Thông lượng</th>
+                            <th class="px-4 py-3">Thời gian/khối (μs)</th>
+                            <th class="px-4 py-3">Thời gian tổng (ms)</th>
+                            <th class="px-4 py-3">Ước tính CPU (%)</th>
+                            <th class="px-4 py-3">Ước tính RAM (KB)</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="bg-gray-800 border-b border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-bold text-lg text-green-400">AES</th>
-                            <td class="px-6 py-4">128 bit</td>
-                            <td class="px-6 py-4 font-mono">2¹²⁸</td>
-                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
-                            <td class="px-6 py-4 text-green-400">"Tiêu chuẩn vàng" toàn cầu.</td>
-                        </tr>
-                        <tr class="bg-gray-800 border-b border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">DES</th>
-                            <td class="px-6 py-4">64 bit</td>
-                            <td class="px-6 py-4 font-mono">2⁵⁶</td>
-                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
-                            <td class="px-6 py-4 text-red-400">Hoàn toàn không an toàn.</td>
-                        </tr>
-                        <tr class="bg-gray-800 border-b border-gray-700">
-                            <th scope="row" class="px-6 py-4 font-bold text-lg text-yellow-400">Blowfish</th>
-                            <td class="px-6 py-4">64 bit</td>
-                            <td class="px-6 py-4 font-mono">Lên tới 2⁴⁴⁸</td>
-                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
-                            <td class="px-6 py-4 text-yellow-400">An toàn nhưng kích thước khối nhỏ là điểm yếu.</td>
-                        </tr>
-                        <tr class="bg-gray-800">
-                            <th scope="row" class="px-6 py-4 font-bold text-lg text-red-400">RC4</th>
-                            <td class="px-6 py-4">N/A (Dòng)</td>
-                            <td class="px-6 py-4 font-mono">Lên tới 2²⁰⁴⁸</td>
-                            <td class="px-6 py-4 font-mono">O(n)<p class="text-xs font-normal text-gray-400">Với n là độ dài dữ liệu.</p></td>
-                            <td class="px-6 py-4 text-red-400">Nhiều lỗ hổng nghiêm trọng.</td>
-                        </tr>
+                    <tbody id="results-tbody">
+                        <!-- Results will be populated dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -175,198 +216,451 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const plaintextInput = document.getElementById('plaintext');
-            const encryptBtn = document.getElementById('encryptBtn');
-            const dashboardPlaceholder = document.getElementById('dashboard-placeholder');
-            const dashboardContent = document.getElementById('dashboard-content');
-
-            const algorithms = {
-                aes: { name: 'AES', type: 'block', blockSize: 16, visElement: document.getElementById('aes-vis') },
-                des: { name: 'DES', type: 'block', blockSize: 8, visElement: document.getElementById('des-vis') },
-                blowfish: { name: 'Blowfish', type: 'block', blockSize: 8, visElement: document.getElementById('blowfish-vis') },
-                rc4: { name: 'RC4', type: 'stream', visElement: document.getElementById('rc4-vis') }
-            };
-
-            let charts = {};
-
-            function escapeHtml(unsafe) { return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
-            async function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
-            async function visualize(algo, text) {
-                const startTime = performance.now();
-                const { type, blockSize, visElement } = algo;
-                visElement.innerHTML = ''; 
-                const delay = Math.max(1, 500 / text.length);
-
-                if (type === 'block') {
-                    const paddedText = text.padEnd(Math.ceil(text.length / blockSize) * blockSize, '_');
-                    for (let i = 0; i < paddedText.length; i += blockSize) {
-                        const chunk = paddedText.substring(i, i + blockSize);
-                        const block = document.createElement('span');
-                        block.className = 'data-block plaintext-block';
-                        block.textContent = escapeHtml(chunk);
-                        visElement.appendChild(block);
-                    }
-                    await sleep(250);
-                    const blocks = visElement.querySelectorAll('.data-block');
-                    for (const block of blocks) {
-                        block.classList.remove('plaintext-block');
-                        block.classList.add('encrypted-block');
-                        block.textContent = Array.from({length: blockSize}, () => '●').join('');
-                        await sleep(delay * blockSize);
-                    }
-                } else if (type === 'stream') {
-                    for (let i = 0; i < text.length; i++) {
-                        const char = text[i];
-                        const charSpan = document.createElement('span');
-                        charSpan.className = 'data-stream-char plaintext-block';
-                        charSpan.textContent = escapeHtml(char);
-                        visElement.appendChild(charSpan);
-                    }
-                    await sleep(250);
-                    const chars = visElement.querySelectorAll('.data-stream-char');
-                    for (const char of chars) {
-                        char.classList.remove('plaintext-block');
-                        char.classList.add('encrypted-block');
-                        char.textContent = '●';
-                        await sleep(delay);
-                    }
-                }
-                const endTime = performance.now();
-                return endTime - startTime;
+        class CryptoPerformanceAnalyzer {
+            constructor() {
+                this.results = {};
+                this.charts = {};
+                this.initializeEventListeners();
+                this.updateInputStats();
             }
 
-            function renderDashboards(performanceData) {
-                dashboardPlaceholder.classList.add('hidden');
-                dashboardContent.classList.remove('hidden');
+            initializeEventListeners() {
+                const plaintextInput = document.getElementById('plaintext');
+                const encryptBtn = document.getElementById('encryptBtn');
 
-                Object.values(charts).forEach(chart => chart.destroy());
+                plaintextInput.addEventListener('input', () => this.updateInputStats());
+                encryptBtn.addEventListener('click', () => this.performAnalysis());
+            }
 
-                // --- Performance Chart (Bar) ---
-                const perfCtx = document.getElementById('performanceChart').getContext('2d');
-                charts.performance = new Chart(perfCtx, {
+            updateInputStats() {
+                const text = document.getElementById('plaintext').value;
+                const charCount = text.length;
+                const byteCount = new TextEncoder().encode(text).length;
+                document.getElementById('inputStats').textContent = 
+                    `Độ dài: ${charCount} ký tự, ${byteCount} bytes`;
+            }
+
+            async performAnalysis() {
+                const text = document.getElementById('plaintext').value;
+                if (!text) {
+                    alert('Vui lòng nhập dữ liệu để phân tích.');
+                    return;
+                }
+
+                const btn = document.getElementById('encryptBtn');
+                btn.disabled = true;
+                btn.textContent = 'Đang phân tích...';
+                btn.classList.add('processing');
+
+                try {
+                    // Clear previous results
+                    this.results = {};
+                    
+                    // Perform encryption tests
+                    await this.testAES(text);
+                    await this.testDES(text);
+                    await this.test3DES(text);
+                    await this.testRC4(text);
+
+                    // Update UI
+                    this.displayResults();
+                    this.createCharts();
+                    this.showPerformanceSection();
+
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    alert('Có lỗi xảy ra trong quá trình phân tích.');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Thực Hiện Mã Hóa';
+                    btn.classList.remove('processing');
+                }
+            }
+
+            measurePerformance(algorithm, encryptFunction, text) {
+                const iterations = 100; // Multiple iterations for accuracy
+                const dataSize = new TextEncoder().encode(text).length;
+                
+                // Warm-up
+                for (let i = 0; i < 10; i++) {
+                    encryptFunction();
+                }
+
+                // Actual measurement
+                const startTime = performance.now();
+                const startMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
+
+                for (let i = 0; i < iterations; i++) {
+                    encryptFunction();
+                }
+
+                const endTime = performance.now();
+                const endMemory = performance.memory ? performance.memory.usedJSHeapSize : startMemory;
+
+                const totalTime = endTime - startTime;
+                const averageTime = totalTime / iterations;
+                const speed = (dataSize * iterations) / (totalTime / 1000) / (1024 * 1024); // MB/s
+                const throughput = speed * 8; // Mbps
+                const memoryUsage = Math.abs(endMemory - startMemory) / 1024; // KB
+                
+                // Estimate CPU usage (simplified)
+                const cpuUsage = Math.min(100, (totalTime / (iterations * 10)) * 100);
+                
+                // Calculate block processing time
+                const blockSize = algorithm === 'RC4' ? 1 : (algorithm === 'AES' ? 16 : 8);
+                const blocks = Math.ceil(dataSize / blockSize);
+                const timePerBlock = blocks > 0 ? (averageTime * 1000) / blocks : 0; // μs per block
+
+                return {
+                    algorithm,
+                    speed: speed.toFixed(2),
+                    throughput: throughput.toFixed(2),
+                    averageTime: averageTime.toFixed(3),
+                    totalTime: totalTime.toFixed(3),
+                    timePerBlock: timePerBlock.toFixed(2),
+                    cpuUsage: cpuUsage.toFixed(1),
+                    memoryUsage: memoryUsage.toFixed(1),
+                    dataSize
+                };
+            }
+
+            async testAES(text) {
+                const key = CryptoJS.lib.WordArray.random(32); // 256-bit key
+                const iv = CryptoJS.lib.WordArray.random(16); // 128-bit IV
+                
+                let encrypted;
+                const encryptFunction = () => {
+                    encrypted = CryptoJS.AES.encrypt(text, key, { 
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+                };
+
+                this.results.aes = this.measurePerformance('AES-256', encryptFunction, text);
+                
+                // Display result
+                document.getElementById('aes-result').innerHTML = `
+                    <div class="text-green-400 mb-2">✓ Mã hóa thành công</div>
+                    <div class="text-xs text-gray-400">Cipher: ${encrypted.toString().substring(0, 100)}...</div>
+                `;
+            }
+
+            async testDES(text) {
+                const key = CryptoJS.lib.WordArray.random(8); // 64-bit key (56 effective)
+                
+                let encrypted;
+                const encryptFunction = () => {
+                    encrypted = CryptoJS.DES.encrypt(text, key, {
+                        mode: CryptoJS.mode.ECB,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+                };
+
+                this.results.des = this.measurePerformance('DES', encryptFunction, text);
+                
+                document.getElementById('des-result').innerHTML = `
+                    <div class="text-green-400 mb-2">✓ Mã hóa thành công</div>
+                    <div class="text-xs text-gray-400">Cipher: ${encrypted.toString().substring(0, 100)}...</div>
+                `;
+            }
+
+            async test3DES(text) {
+                const key = CryptoJS.lib.WordArray.random(24); // 192-bit key (168 effective)
+                
+                let encrypted;
+                const encryptFunction = () => {
+                    encrypted = CryptoJS.TripleDES.encrypt(text, key, {
+                        mode: CryptoJS.mode.ECB,
+                        padding: CryptoJS.pad.Pkcs7
+                    });
+                };
+
+                this.results.tripledes = this.measurePerformance('3DES', encryptFunction, text);
+                
+                document.getElementById('tripledes-result').innerHTML = `
+                    <div class="text-green-400 mb-2">✓ Mã hóa thành công</div>
+                    <div class="text-xs text-gray-400">Cipher: ${encrypted.toString().substring(0, 100)}...</div>
+                `;
+            }
+
+            async testRC4(text) {
+                const key = CryptoJS.lib.WordArray.random(16); // 128-bit key
+                
+                let encrypted;
+                const encryptFunction = () => {
+                    encrypted = CryptoJS.RC4.encrypt(text, key);
+                };
+
+                this.results.rc4 = this.measurePerformance('RC4', encryptFunction, text);
+                
+                document.getElementById('rc4-result').innerHTML = `
+                    <div class="text-green-400 mb-2">✓ Mã hóa thành công</div>
+                    <div class="text-xs text-gray-400">Cipher: ${encrypted.toString().substring(0, 100)}...</div>
+                `;
+            }
+
+            displayResults() {
+                // Update metrics grid
+                const metricsGrid = document.getElementById('metrics-grid');
+                metricsGrid.innerHTML = '';
+
+                const metrics = [
+                    { label: 'Tốc Độ TB', unit: 'MB/s', getValue: (r) => r.speed },
+                    { label: 'Thông Lượng TB', unit: 'Mbps', getValue: (r) => r.throughput },
+                    { label: 'Thời Gian TB', unit: 'ms', getValue: (r) => r.averageTime },
+                    { label: 'CPU TB', unit: '%', getValue: (r) => r.cpuUsage },
+                    { label: 'RAM TB', unit: 'KB', getValue: (r) => r.memoryUsage },
+                    { label: 'Thời Gian/Khối', unit: 'μs', getValue: (r) => r.timePerBlock }
+                ];
+
+                metrics.forEach(metric => {
+                    const values = Object.values(this.results).map(r => parseFloat(metric.getValue(r)));
+                    const average = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+                    
+                    const metricDiv = document.createElement('div');
+                    metricDiv.className = 'performance-metric p-4 rounded-lg text-center';
+                    metricDiv.innerHTML = `
+                        <div class="text-2xl font-bold text-cyan-400">${average}</div>
+                        <div class="text-xs text-gray-400">${metric.label}</div>
+                        <div class="text-xs text-gray-500">${metric.unit}</div>
+                    `;
+                    metricsGrid.appendChild(metricDiv);
+                });
+
+                // Update results table
+                const tbody = document.getElementById('results-tbody');
+                tbody.innerHTML = '';
+
+                Object.values(this.results).forEach(result => {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-gray-800 border-b border-gray-700';
+                    row.innerHTML = `
+                        <td class="px-4 py-3 font-bold text-lg">${result.algorithm}</td>
+                        <td class="px-4 py-3 font-mono">${result.speed}</td>
+                        <td class="px-4 py-3 font-mono">${result.throughput} Mbps</td>
+                        <td class="px-4 py-3 font-mono">${result.timePerBlock}</td>
+                        <td class="px-4 py-3 font-mono">${result.averageTime}</td>
+                        <td class="px-4 py-3 font-mono">${result.cpuUsage}</td>
+                        <td class="px-4 py-3 font-mono">${result.memoryUsage}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            createCharts() {
+                // Destroy existing charts
+                Object.values(this.charts).forEach(chart => chart.destroy());
+                this.charts = {};
+
+                const algorithms = Object.keys(this.results);
+                const colors = {
+                    'AES-256': '#22c55e',
+                    'DES': '#ef4444', 
+                    '3DES': '#3b82f6',
+                    'RC4': '#8b5cf6'
+                };
+
+                // Speed Chart
+                const speedCtx = document.getElementById('speedChart').getContext('2d');
+                this.charts.speed = new Chart(speedCtx, {
                     type: 'bar',
                     data: {
-                        labels: performanceData.map(d => d.name),
+                        labels: algorithms,
                         datasets: [{
-                            label: 'Thời gian thực thi (ms)',
-                            data: performanceData.map(d => d.time),
-                            backgroundColor: ['#22c55e', '#ef4444', '#3b82f6', '#8b5cf6'],
-                            borderColor: '#4b5563',
+                            label: 'Tốc độ (MB/s)',
+                            data: algorithms.map(algo => parseFloat(this.results[algo].speed)),
+                            backgroundColor: algorithms.map(algo => colors[this.results[algo].algorithm]),
                             borderWidth: 1
                         }]
                     },
                     options: {
-                        indexAxis: 'y',
-                        scales: { x: { ticks: { color: '#d1d5db' } }, y: { ticks: { color: '#d1d5db' } } },
-                        plugins: { 
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    afterLabel: function(context) {
-                                        return 'Càng thấp càng tốt (thuật toán nhanh hơn).';
-                                    }
-                                }
-                            }
-                        },
-                        responsive: true, maintainAspectRatio: false
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: '#d1d5db' }
+                            },
+                            x: { ticks: { color: '#d1d5db' } }
+                        }
                     }
                 });
 
-                // --- Security Chart (Radar) ---
-                const securityCtx = document.getElementById('securityChart').getContext('2d');
-                const securityTooltips = [
-                    'Không gian khóa: Số lượng khóa có thể có. Càng lớn càng khó bị tấn công vét cạn.',
-                    'Kích thước khối: Lượng dữ liệu xử lý mỗi lần. Lớn (128-bit) giúp chống lại các tấn công hiện đại.',
-                    'Độ bền thuật toán: Khả năng chống lại các tấn công phân tích mật mã. Càng cao càng tốt.',
-                    'Mức độ phù hợp: Mức độ tin cậy và khuyến nghị sử dụng ngày nay. Càng cao càng tốt.'
-                ];
-                const securityData = {
-                    labels: ['Không gian khóa', 'Kích thước khối', 'Độ bền thuật toán', 'Mức độ phù hợp'],
-                    datasets: [
-                        { label: 'AES', data: [10, 10, 10, 10], fill: true, backgroundColor: 'rgba(34, 197, 94, 0.2)', borderColor: '#22c55e', pointBackgroundColor: '#22c55e' },
-                        { label: 'DES', data: [1, 5, 1, 1], fill: true, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: '#ef4444', pointBackgroundColor: '#ef4444' },
-                        { label: 'Blowfish', data: [10, 5, 8, 4], fill: true, backgroundColor: 'rgba(234, 179, 8, 0.2)', borderColor: '#eab308', pointBackgroundColor: '#eab308' },
-                        { label: 'RC4', data: [10, 0, 1, 1], fill: true, backgroundColor: 'rgba(139, 92, 246, 0.2)', borderColor: '#8b5cf6', pointBackgroundColor: '#8b5cf6' }
-                    ]
-                };
-                charts.security = new Chart(securityCtx, {
-                    type: 'radar',
-                    data: securityData,
+                // Time Chart
+                const timeCtx = document.getElementById('timeChart').getContext('2d');
+                this.charts.time = new Chart(timeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: algorithms,
+                        datasets: [{
+                            label: 'Thời gian (ms)',
+                            data: algorithms.map(algo => parseFloat(this.results[algo].averageTime)),
+                            backgroundColor: algorithms.map(algo => colors[this.results[algo].algorithm]),
+                            borderWidth: 1
+                        }]
+                    },
                     options: {
-                        scales: { r: { angleLines: { color: '#4b5563' }, grid: { color: '#4b5563' }, pointLabels: { color: '#d1d5db', font: {size: 11} }, ticks: { display: false } } },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: '#d1d5db' }
+                            },
+                            x: { ticks: { color: '#d1d5db' } }
+                        }
+                    }
+                });
+
+                // Throughput Chart (Line)
+                const throughputCtx = document.getElementById('throughputChart').getContext('2d');
+                this.charts.throughput = new Chart(throughputCtx, {
+                    type: 'line',
+                    data: {
+                        labels: algorithms,
+                        datasets: [{
+                            label: 'Thông lượng (Mbps)',
+                            data: algorithms.map(algo => parseFloat(this.results[algo].throughput)),
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#d1d5db' } } },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: '#d1d5db' }
+                            },
+                            x: { ticks: { color: '#d1d5db' } }
+                        }
+                    }
+                });
+
+                // Resource Usage Chart (Radar)
+                const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+                this.charts.resource = new Chart(resourceCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Hiệu quả CPU (ít % tốt)', 'Hiệu quả Memory (ít KB tốt)', 'Tốc độ (MB/s)', 'Hiệu suất thời gian'],
+                        datasets: algorithms.map(algo => {
+                            const result = this.results[algo];
+                            
+                            // For CPU and Memory: Lower is better (invert the values)
+                            // Convert to "efficiency" where higher values mean better performance
+                            const cpuEfficiency = Math.max(0, 100 - parseFloat(result.cpuUsage));
+                            const memoryEfficiency = Math.max(0, 100 - Math.min(100, parseFloat(result.memoryUsage)));
+                            
+                            // For Speed and Time Efficiency: Higher is better (keep as is)
+                            const speedScore = Math.min(100, parseFloat(result.speed) * 10);
+                            const timeEfficiency = Math.min(100, (1 / parseFloat(result.averageTime)) * 10);
+                            
+                            return {
+                                label: result.algorithm,
+                                data: [
+                                    cpuEfficiency,
+                                    memoryEfficiency, 
+                                    speedScore,
+                                    timeEfficiency
+                                ],
+                                borderColor: colors[result.algorithm],
+                                backgroundColor: colors[result.algorithm] + '20',
+                                fill: true,
+                                borderWidth: 2
+                            };
+                        })
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: { 
-                            legend: { labels: { color: '#d1d5db' } },
+                            legend: { 
+                                labels: { color: '#d1d5db' }
+                            },
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
                                         let label = context.dataset.label || '';
                                         if (label) { label += ': '; }
-                                        if (context.parsed.r !== null) { label += context.parsed.r + '/10'; }
+                                        label += context.parsed.r.toFixed(1) + '/100';
+                                        
+                                        // Add explanation based on metric
+                                        const explanations = [
+                                            ' (CPU thấp = tốt)',
+                                            ' (RAM thấp = tốt)', 
+                                            ' (Tốc độ cao = tốt)',
+                                            ' (Thời gian ngắn = tốt)'
+                                        ];
+                                        label += explanations[context.dataIndex];
+                                        
                                         return label;
-                                    },
-                                    afterLabel: function(context) {
-                                        return securityTooltips[context.dataIndex].split('\n');
                                     }
                                 }
                             }
                         },
-                        responsive: true, maintainAspectRatio: false
-                    }
-                });
-
-                // --- Relevance Chart (Doughnut) ---
-                const relevanceCtx = document.getElementById('relevanceChart').getContext('2d');
-                charts.relevance = new Chart(relevanceCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['AES', 'Blowfish', 'DES/RC4 & Khác'],
-                        datasets: [{
-                            label: 'Thị phần ứng dụng ước tính',
-                            data: [90, 5, 5],
-                            backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        plugins: { 
-                            legend: { position: 'top', labels: { color: '#d1d5db' } },
-                            tooltip: {
-                                callbacks: {
-                                    afterLabel: function(context) {
-                                        return 'Ước tính mức độ phổ biến và tin cậy trong các ứng dụng thực tế.';
-                                    }
+                        scales: {
+                            r: {
+                                angleLines: { color: '#4b5563' },
+                                grid: { color: '#4b5563' },
+                                pointLabels: { 
+                                    color: '#d1d5db',
+                                    font: { size: 9 }
+                                },
+                                ticks: { 
+                                    display: false,
+                                    max: 100,
+                                    min: 0
                                 }
                             }
-                        },
-                        responsive: true, maintainAspectRatio: false
+                        }
                     }
                 });
             }
 
-            encryptBtn.addEventListener('click', async () => {
-                const text = plaintextInput.value;
-                if (!text) {
-                    alert('Vui lòng nhập văn bản để trực quan hóa.');
-                    return;
+            showPerformanceSection() {
+                document.getElementById('performance-section').style.display = 'block';
+                document.getElementById('results-table').style.display = 'block';
+            }
+
+            // Simplified implementations for demonstration
+            simpleRC4(text, key) {
+                // Simplified RC4 implementation for demo
+                const keyArray = key.toString().split('').map(c => c.charCodeAt(0));
+                const S = Array.from({length: 256}, (_, i) => i);
+                
+                // KSA (Key Scheduling Algorithm)
+                let j = 0;
+                for (let i = 0; i < 256; i++) {
+                    j = (j + S[i] + keyArray[i % keyArray.length]) % 256;
+                    [S[i], S[j]] = [S[j], S[i]];
                 }
                 
-                encryptBtn.disabled = true;
-                encryptBtn.textContent = 'Đang xử lý...';
-
-                const performanceResults = [];
-                for (const key in algorithms) {
-                    const algo = algorithms[key];
-                    const time = await visualize(algo, text);
-                    performanceResults.push({ name: algo.name, time: time });
+                // PRGA (Pseudo-Random Generation Algorithm)
+                let i = 0;
+                j = 0;
+                const result = [];
+                for (let k = 0; k < text.length; k++) {
+                    i = (i + 1) % 256;
+                    j = (j + S[i]) % 256;
+                    [S[i], S[j]] = [S[j], S[i]];
+                    const keyStream = S[(S[i] + S[j]) % 256];
+                    result.push(text.charCodeAt(k) ^ keyStream);
                 }
                 
-                renderDashboards(performanceResults);
+                return result.map(c => c.toString(16).padStart(2, '0')).join('');
+            }
+        }
 
-                encryptBtn.disabled = false;
-                encryptBtn.textContent = 'Trực Quan Hóa';
-            });
+        // Initialize the analyzer when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new CryptoPerformanceAnalyzer();
         });
     </script>
 
